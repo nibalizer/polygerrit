@@ -1,0 +1,17 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="change-list">
+  <template>
+    <template is="dom-bind">
+      <change-collection location="data.json" data="{{changes}}"></change-collection>
+      <template is="dom-repeat" items="[[changes]]" as="change">
+        <div>[[change.id]]</div>
+      </template>
+    </template>
+  </template>
+  <script>
+    Polymer({
+      is: "change-list"
+    });
+  </script>
+</dom-module>

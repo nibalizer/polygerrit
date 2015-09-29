@@ -1,0 +1,38 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<script>
+(function() {
+  'use strict';
+
+  var ChangeCollection = Polymer({
+    is: 'change-collection',
+
+    properties: {
+      location: {
+        type: String,
+        notify: true,
+        reflectToAttribute: true
+      },
+
+      data: {
+        type: Array,
+        notify: true,
+        value: function() {
+          return [];
+        }
+      }
+    },
+
+    ready: function() {
+      this.data = [
+        {
+          id: "hello, id1"
+        },
+        {
+          id: "hi"
+        }
+      ]
+    }
+  })
+})();
+</script>

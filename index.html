@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<title>PolyGerrit</title>
+<script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+<link rel="import" href="elements/elements.html">
+
+<body unresolved>
+<template is="dom-bind" id="app">
+  <iron-pages attr-for-selected="data-route" selected="{{route}}">
+    <section data-route="page1">
+      <change-list></change-list>
+    </section>
+    <section data-route="page2">
+      This is page 2!
+    </section>
+  </iron-pages>
+</template>
+
+<script src="scripts/app.js"></script>
