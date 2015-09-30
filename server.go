@@ -6,9 +6,9 @@ import (
 	"net/http"
 )
 
-func main() {
-	var port = flag.String("port", ":8081", "Port to serve HTTP requests on")
+var port = flag.String("port", ":8081", "Port to serve HTTP requests on")
 
+func main() {
 	flag.Parse()
 
 	http.Handle("/", http.FileServer(http.Dir(".")))
