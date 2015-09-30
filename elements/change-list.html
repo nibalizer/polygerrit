@@ -2,16 +2,27 @@
 
 <dom-module id="change-list">
   <template>
-    <template is="dom-bind">
-      <change-collection location="data.json" data="{{changes}}"></change-collection>
-      <template is="dom-repeat" items="[[changes]]" as="change">
-        <div>[[change.id]]</div>
-      </template>
+    <iron-ajax
+        auto
+        url="/data.json"
+        params='{}'
+        handle-as="text"
+        on-response="handleResponse"
+        debounce-duration="300"></iron-ajax>
+    <template is="dom-repeat" items="[[changes]]" as="change">
+      <div>[[change.change_id]]</div>
     </template>
+
   </template>
   <script>
     Polymer({
-      is: "change-list"
+      is: "change-list",
+
+      handleResponse: function(e, req) {
+        console.log(arguments)
+        console.log(req.response);
+        this.changes = JSON.parse(req.response.substring(')]}\''.length));
+      }
     });
   </script>
 </dom-module>
