@@ -40,83 +40,28 @@ var styleTask = function (stylesPath, srcs) {
     .pipe($.size({title: stylesPath}));
 };
 
-// Compile and automatically prefix stylesheets
-gulp.task('styles', function () {
-  return styleTask('styles', ['**/*.css']);
-});
-
-gulp.task('elements', function () {
-  return styleTask('elements', ['**/*.css']);
-});
-
-// Lint JavaScript
-gulp.task('jshint', function () {
-  return gulp.src([
-      'app/scripts/**/*.js',
-      'app/elements/**/*.js',
-      'app/elements/**/*.html'
-    ])
-    .pipe(reload({stream: true, once: true}))
+var jshintTask = function (src) {
+  return gulp.src(src)
     .pipe($.jshint.extract()) // Extract JS from .html files
     .pipe($.jshint())
     .pipe($.jshint.reporter('jshint-stylish'))
     .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
-});
+};
 
-// Optimize images
-gulp.task('images', function () {
-  return gulp.src('app/images/**/*')
+var imageOptimizeTask = function (src, dest) {
+  return gulp.src(src)
     .pipe($.cache($.imagemin({
       progressive: true,
       interlaced: true
     })))
-    .pipe(gulp.dest('dist/images'))
+    .pipe(gulp.dest(dest))
     .pipe($.size({title: 'images'}));
-});
+};
 
-// Copy all files at the root level (app)
-gulp.task('copy', function () {
-  var app = gulp.src([
-    'app/*',
-    '!app/test',
-    '!app/cache-config.json'
-  ], {
-    dot: true
-  }).pipe(gulp.dest('dist'));
-
-  var bower = gulp.src([
-    'bower_components/**/*'
-  ]).pipe(gulp.dest('dist/bower_components'));
-
-  var elements = gulp.src(['app/elements/**/*.html'])
-    .pipe(gulp.dest('dist/elements'));
-
-  var swBootstrap = gulp.src(['bower_components/platinum-sw/bootstrap/*.js'])
-    .pipe(gulp.dest('dist/elements/bootstrap'));
-
-  var swToolbox = gulp.src(['bower_components/sw-toolbox/*.js'])
-    .pipe(gulp.dest('dist/sw-toolbox'));
-
-  var vulcanized = gulp.src(['app/elements/elements.html'])
-    .pipe($.rename('elements.vulcanized.html'))
-    .pipe(gulp.dest('dist/elements'));
-
-  return merge(app, bower, elements, vulcanized, swBootstrap, swToolbox)
-    .pipe($.size({title: 'copy'}));
-});
-
-// Copy web fonts to dist
-gulp.task('fonts', function () {
-  return gulp.src(['app/fonts/**'])
-    .pipe(gulp.dest('dist/fonts'))
-    .pipe($.size({title: 'fonts'}));
-});
-
-// Scan your HTML for assets & optimize them
-gulp.task('html', function () {
+var optimizeHtmlTask = function (src, dest) {
   var assets = $.useref.assets({searchPath: ['.tmp', 'app', 'dist']});
 
-  return gulp.src(['app/**/*.html', '!app/{elements,test}/**/*.html'])
+  return gulp.src(src)
     // Replace path for vulcanized assets
     .pipe($.if('*.html', $.replace('elements/elements.html', 'elements/elements.vulcanized.html')))
     .pipe(assets)
@@ -134,8 +79,76 @@ gulp.task('html', function () {
       spare: true
     })))
     // Output files
-    .pipe(gulp.dest('dist'))
+    .pipe(gulp.dest(dest))
     .pipe($.size({title: 'html'}));
+};
+
+// Compile and automatically prefix stylesheets
+gulp.task('styles', function () {
+  return styleTask('styles', ['**/*.css']);
+});
+
+gulp.task('elements', function () {
+  return styleTask('elements', ['**/*.css']);
+});
+
+// Lint JavaScript
+gulp.task('jshint', function () {
+  return jshintTask([
+      'app/scripts/**/*.js',
+      'app/elements/**/*.js',
+      'app/elements/**/*.html',
+      'gulpfile.js'
+    ])
+    .pipe($.jshint.extract()) // Extract JS from .html files
+    .pipe($.jshint())
+    .pipe($.jshint.reporter('jshint-stylish'))
+    .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
+});
+
+// Optimize images
+gulp.task('images', function () {
+  return imageOptimizeTask('app/images/**/*', 'dist/images');
+});
+
+// Copy all files at the root level (app)
+gulp.task('copy', function () {
+  var app = gulp.src([
+    'app/*',
+    '!app/test'
+  ], {
+    dot: true
+  }).pipe(gulp.dest('dist'));
+
+  var bower = gulp.src([
+    'bower_components/**/*'
+  ]).pipe(gulp.dest('dist/bower_components'));
+
+  var elements = gulp.src(['app/elements/**/*.html',
+                           'app/elements/**/*.css',
+                           'app/elements/**/*.js'])
+    .pipe(gulp.dest('dist/elements'));
+
+  var vulcanized = gulp.src(['app/elements/elements.html'])
+    .pipe($.rename('elements.vulcanized.html'))
+    .pipe(gulp.dest('dist/elements'));
+
+  return merge(app, bower, elements, vulcanized)
+    .pipe($.size({title: 'copy'}));
+});
+
+// Copy web fonts to dist
+gulp.task('fonts', function () {
+  return gulp.src(['app/fonts/**'])
+    .pipe(gulp.dest('dist/fonts'))
+    .pipe($.size({title: 'fonts'}));
+});
+
+// Scan your HTML for assets & optimize them
+gulp.task('html', function () {
+  return optimizeHtmlTask(
+    ['app/**/*.html', '!app/{elements,test}/**/*.html'],
+    'dist');
 });
 
 // Polybuild will take care of inlining HTML imports,
@@ -156,37 +169,6 @@ gulp.task('rename-index', function () {
     .pipe($.rename('index.html'))
     .pipe(gulp.dest('dist/'));
   return del(['dist/index.build.html']);
-});
-
-// Generate config data for the <sw-precache-cache> element.
-// This include a list of files that should be precached, as well as a (hopefully unique) cache
-// id that ensure that multiple PSK projects don't share the same Cache Storage.
-// This task does not run by default, but if you are interested in using service worker caching
-// in your project, please enable it within the 'default' task.
-// See https://github.com/PolymerElements/polymer-starter-kit#enable-service-worker-support
-// for more context.
-gulp.task('cache-config', function (callback) {
-  var dir = 'dist';
-  var config = {
-    cacheId: packageJson.name || path.basename(__dirname),
-    disabled: false
-  };
-
-  glob('{elements,scripts,styles}/**/*.*', {cwd: dir}, function(error, files) {
-    if (error) {
-      callback(error);
-    } else {
-      files.push('index.html', './', 'bower_components/webcomponentsjs/webcomponents-lite.min.js');
-      config.precache = files;
-
-      var md5 = crypto.createHash('md5');
-      md5.update(JSON.stringify(config.precache));
-      config.precacheFingerprint = md5.digest('hex');
-
-      var configPath = path.join(dir, 'cache-config.json');
-      fs.writeFile(configPath, JSON.stringify(config), callback);
-    }
-  });
 });
 
 // Clean output directory
