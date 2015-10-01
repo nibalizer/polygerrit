@@ -5,24 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PolyGerrit</title>
 
-<!-- Chrome for Android theme color -->
-<meta name="theme-color" content="#2E3AA1">
-<!-- Web Application Manifest -->
-<link rel="manifest" href="manifest.json">
-<!-- Tile color for Win8 -->
-<meta name="msapplication-TileColor" content="#3372DF">
-<!-- Add to homescreen for Chrome on Android -->
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="application-name" content="PSK">
-<link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
-<!-- Add to homescreen for Safari on iOS -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="PolyGerrit">
-<link rel="apple-touch-icon" href="images/touch/apple-touch-icon.png">
-<!-- Tile icon for Win8 (144x144) -->
-<meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
-
 <!-- build:css styles/main.css -->
 <link rel="stylesheet" href="styles/main.css">
 <!-- endbuild-->
@@ -40,10 +22,36 @@
 
 <body unresolved>
 <template is="dom-bind" id="app">
+  <style>
+    change-list {
+      margin: 0 20px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+    }
+    .bigTitle {
+      font-size: 24px;
+    }
+    .searchContainer {
+      display: flex;
+      flex: 1;
+      justify-content: flex-end;
+    }
+    search-bar {
+      width: 500px;
+    }
+  </style>
   <iron-pages attr-for-selected="data-route" selected="{{route}}">
     <section data-route="page1">
-      <input class="queryInput" is="iron-input" bind-value="{{inputVal}}">
-      <change-list query="[[changeQuery]]"></change-list>
+      <header role="banner">
+        <span class="bigTitle">PolyGerrit</span>
+        <div class="searchContainer">
+          <search-bar roll="search"></search-bar>
+        </div>
+      </header>
+      <change-list query="[[changeQuery]]" roll="main"></change-list>
+      <footer roll="contentinfo">Powered by PolyGerrit</footer>
     </section>
     <section data-route="page2">
       This is another page.
@@ -54,16 +62,6 @@
 <!-- build:js scripts/app.js -->
 <script src="scripts/app.js"></script>
 <!-- endbuild-->
-
-<script>
-window.addEventListener('WebComponentsReady', function() {
-  var input = document.querySelector('.queryInput');
-  input.addEventListener('bind-value-changed', function(e) {
-    console.log('input value has changed: ', e.detail.value)
-    console.log(arguments);
-  });
-});
-</script>
 
 
 

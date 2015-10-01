@@ -9,11 +9,7 @@ var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var merge = require('merge-stream');
 var path = require('path');
-var fs = require('fs');
-var glob = require('glob');
 var historyApiFallback = require('connect-history-api-fallback');
-var packageJson = require('./package.json');
-var crypto = require('crypto');
 var polybuild = require('polybuild');
 
 var AUTOPREFIXER_BROWSERS = [

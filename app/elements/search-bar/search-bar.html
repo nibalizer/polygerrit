@@ -1,0 +1,60 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="search-bar">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      div {
+        display: flex;
+      }
+      input,
+      button {
+        border: 1px solid #aaa;
+        font-family: inherit;
+        font-size: 14px;
+        padding: 2px 5px;
+      }
+      input {
+        flex: 1;
+        border-radius: 2px 0 0 2px;
+      }
+      button {
+        background-color: #f1f2f3;
+        border-radius: 0 2px 2px 0;
+        border-left-width: 0;
+      }
+    </style>
+    <div>
+      <input is="iron-input" bind-value="{{inputVal}}">
+      <button>Search</button>
+    </div>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'search-bar',
+
+      properties: {
+        foo: {
+          type: String,
+          value: 'search-bar',
+          notify: true
+        }
+      },
+
+      ready: function() {
+        this.addEventListener('bind-value-changed', function(e) {
+          console.log('input value has changed: ', e.detail.value)
+          console.log(arguments);
+        });
+      }
+
+    });
+
+  })();
+  </script>
+</dom-module>
