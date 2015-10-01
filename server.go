@@ -13,7 +13,10 @@ var port = flag.String("port", ":8081", "Port to serve HTTP requests on")
 func main() {
 	flag.Parse()
 
-	http.Handle("/", http.FileServer(http.Dir(".")))
+	http.Handle("/bower_components/",
+		http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components"))))
+	http.Handle("/", http.FileServer(http.Dir("app")))
+
 	http.HandleFunc("/changes/", handleChanges)
 	log.Println("Serving on port", *port)
 	log.Fatal(http.ListenAndServe(*port, nil))

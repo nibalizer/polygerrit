@@ -6,13 +6,6 @@
   ],
   "description": "Gerrit UI in Polymer",
   "private": true,
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.1.0",
     "page": "visionmedia/page.js#~1.6.3",
