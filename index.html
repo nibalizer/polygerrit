@@ -9,19 +9,28 @@
 change-list {
   margin: 20px 10px;
 }
-
 </style>
 
 <body unresolved>
 <template is="dom-bind" id="app">
   <iron-pages attr-for-selected="data-route" selected="{{route}}">
     <section data-route="page1">
-      <change-list></change-list>
+      <input class="queryInput" is="iron-input" bind-value="{{inputVal}}">
+      <change-list query="[[changeQuery]]"></change-list>
     </section>
     <section data-route="page2">
-      This is page 2!
+      This is another page.
     </section>
   </iron-pages>
 </template>
 
 <script src="scripts/app.js"></script>
+<script>
+window.addEventListener('WebComponentsReady', function() {
+  var input = document.querySelector('.queryInput');
+  input.addEventListener('bind-value-changed', function(e) {
+    console.log('input value has changed: ', e.detail.value)
+    console.log(arguments);
+  });
+});
+</script>

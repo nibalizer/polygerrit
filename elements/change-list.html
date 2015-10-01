@@ -42,8 +42,8 @@
   <template>
     <iron-ajax
         auto
-        url="/data.json"
-        params='{}'
+        url="/changes/"
+        params='{"n": 25, "O": 81}'
         handle-as="text"
         on-response="_handleResponse"
         debounce-duration="300"></iron-ajax>
@@ -51,6 +51,7 @@
         target="[[keyTarget]]"
         keys="j k"
         on-keys-pressed="_handleKey"></iron-a11y-keys>
+    <div>{{query}}</div>
     <table tabindex="0">
       <tr>
         <th></th> <!-- keyboard position indicator -->
@@ -101,6 +102,16 @@
   Polymer({
     is: "change-list",
 
+    properties: {
+      /**
+       * The query string used to refine the list.
+       */
+      query: {
+        type: String,
+        value: ''
+      }
+    },
+
     keyTarget: {
       type: Object,
       value: function() {
@@ -146,7 +157,6 @@
 
     _updatedString: function(updated) {
       var d = new Date(updated);
-      console.log(d);
       return d;
     }
 
