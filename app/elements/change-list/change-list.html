@@ -84,7 +84,7 @@
           <td>
             <a href$="[[_projectBranchURL(change.project, change.branch)]]">[[change.branch]]</a>
           </td>
-          <td>[[_updatedString(change.updated)]]</td>
+          <td><date-formatter date-str="[[change.updated]]"></date-formatter></td>
           <td>Size</td>
           <td title="Code-Review">CR</td>
           <td title="Library-Compliance">LC</td>
@@ -127,6 +127,7 @@
         var obj = {
           n: 25,  // Number of results to return.
           O: 81,  // Include owner information.
+          S: 0,   // Offset for results.
         };
         if (query && query.length > 0) {
           obj.q = query;
@@ -176,10 +177,6 @@
         return '/q/status:open+project:' + project + '+branch:' + branch;
       },
 
-      _updatedString: function(updated) {
-        var d = new Date(updated);
-        return d;
-      }
     });
 
   })();
