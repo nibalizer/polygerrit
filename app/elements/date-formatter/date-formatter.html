@@ -33,7 +33,7 @@
         var diff = now.diff(d, 'days');
         if (diff < 1) {
           // Is the day of the week different?
-          if (d.day() != now.day()) {
+          if (d.day() !== now.day()) {
             return d.format('MMM D'); // 'Aug 29'
           }
           return d.format('h:mm A');  // '2:14 AM'

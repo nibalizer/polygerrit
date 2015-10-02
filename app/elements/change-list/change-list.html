@@ -143,13 +143,13 @@
         // Don’t re-render the entire list.
         var changeEls = this.querySelectorAll('tr.change');
         for (var i = 0; i < changeEls.length; i++) {
-          this.toggleClass('is-selected', i == this.selectedIndex, changeEls[i]);
+          this.toggleClass('is-selected', i === value, changeEls[i]);
         }
       },
 
       _computeItemClass: function(index) {
         var classes = ['change'];
-        if (index == this.selectedIndex) {
+        if (index === this.selectedIndex) {
           classes.push('is-selected');
         }
         return classes.join(' ');
@@ -175,11 +175,11 @@
         var len = (this.changes && this.changes.length) || 0;
         switch(e.detail.combo) {
           case 'j':
-            if (this.selectedIndex == len - 1) { return; }
+            if (this.selectedIndex === len - 1) { return; }
             this.selectedIndex += 1;
             break;
           case 'k':
-            if (this.selectedIndex == 0) { return; }
+            if (this.selectedIndex === 0) { return; }
             this.selectedIndex -= 1;
             break;
           case 'enter':

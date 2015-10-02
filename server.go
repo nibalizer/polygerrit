@@ -25,7 +25,7 @@ func main() {
 
 	http.HandleFunc("/changes/", handleChanges)
 	log.Println("Serving on port", *port)
-	log.Fatal(http.ListenAndServe(*port, nil))
+	log.Fatal(http.ListenAndServe(*port, &server{}))
 }
 
 func handleChanges(w http.ResponseWriter, r *http.Request) {
@@ -46,4 +46,11 @@ func handleChanges(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error copying response to ResponseWriter:", err)
 		return
 	}
+}
+
+type server struct{}
+
+func (_ *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("%s %s %s %s\n", r.Proto, r.Method, r.RemoteAddr, r.URL)
+	http.DefaultServeMux.ServeHTTP(w, r)
 }
