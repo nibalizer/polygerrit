@@ -8,16 +8,20 @@ import (
 	"net/url"
 )
 
-var port = flag.String("port", ":8081", "Port to serve HTTP requests on")
-
 func main() {
+	var (
+		port = flag.String("port", ":8081", "Port to serve HTTP requests on")
+		prod = flag.Bool("prod", false, "Serve production assets")
+	)
 	flag.Parse()
 
-	http.Handle("/bower_components/",
-		http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components"))))
-	http.Handle("/dist/",
-		http.StripPrefix("/dist/", http.FileServer(http.Dir("dist"))))
-	http.Handle("/", http.FileServer(http.Dir("app")))
+	if *prod {
+		http.Handle("/", http.FileServer(http.Dir("dist")))
+	} else {
+		http.Handle("/bower_components/",
+			http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components"))))
+		http.Handle("/", http.FileServer(http.Dir("app")))
+	}
 
 	http.HandleFunc("/changes/", handleChanges)
 	log.Println("Serving on port", *port)

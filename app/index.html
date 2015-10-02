@@ -31,7 +31,12 @@
       align-items: center;
     }
     .bigTitle {
+      color: #000;
       font-size: 24px;
+      text-decoration: none;
+    }
+    .bigTitle:hover {
+      text-decoration: underline;
     }
     .searchContainer {
       display: flex;
@@ -42,21 +47,14 @@
       width: 500px;
     }
   </style>
-  <iron-pages attr-for-selected="data-route" selected="{{route}}">
-    <section data-route="page1">
-      <header role="banner">
-        <span class="bigTitle">PolyGerrit</span>
-        <div class="searchContainer">
-          <search-bar roll="search"></search-bar>
-        </div>
-      </header>
-      <change-list query="[[changeQuery]]" roll="main"></change-list>
-      <footer roll="contentinfo">Powered by PolyGerrit</footer>
-    </section>
-    <section data-route="page2">
-      This is another page.
-    </section>
-  </iron-pages>
+  <header role="banner">
+    <a href="/" class="bigTitle">PolyGerrit</a>
+    <div class="searchContainer">
+      <search-bar value="[[params.query]]" roll="search"></search-bar>
+    </div>
+  </header>
+  <change-list query="[[params.query]]" roll="main"></change-list>
+  <footer roll="contentinfo">Powered by PolyGerrit</footer>
 </template>
 
 <!-- build:js scripts/app.js -->

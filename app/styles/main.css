@@ -13,9 +13,7 @@ body {
 body {
   font: 12px 'Open Sans', sans-serif;
 }
-header {
-  padding: 20px;
-}
+header,
 footer {
   padding: 20px;
 }

@@ -43,7 +43,7 @@
     <iron-ajax
         auto
         url="/changes/"
-        params='{"n": 25, "O": 81}'
+        params="{{_computeQueryParams(query)}}"
         handle-as="text"
         on-response="_handleResponse"
         debounce-duration="300"></iron-ajax>
@@ -51,7 +51,6 @@
         target="[[keyTarget]]"
         keys="j k"
         on-keys-pressed="_handleKey"></iron-a11y-keys>
-    <div>{{query}}</div>
     <table tabindex="0">
       <tr>
         <th></th> <!-- keyboard position indicator -->
@@ -109,15 +108,36 @@
          */
         query: {
           type: String,
-          value: ''
+          value: 'status:open',
+          notify: true
+        },
+
+        /**
+         * The target element used by the a11y key handler.
+         */
+        keyTarget: {
+          type: Object,
+          value: function() {
+            return document.body;
+          }
         }
       },
 
-      keyTarget: {
-        type: Object,
-        value: function() {
-          return document.body;
+      _computeQueryParams: function(query) {
+        var obj = {
+          n: 25,  // Number of results to return.
+          O: 81,  // Include owner information.
+        };
+        if (query && query.length > 0) {
+          obj.q = query;
         }
+        return obj;
+      },
+
+      ready: function() {
+        this.addEventListener('query-changed', function(e) {
+          console.log('query changed', e.detail.value)
+        })
       },
 
       _handleResponse: function(e, req) {
@@ -140,7 +160,7 @@
       },
 
       _ownerLink: function(owner) {
-        return BASE_URL + '#/q/owner:' + encodeURIComponent(owner.email) + '+status:open';
+        return '/q/owner:' + encodeURIComponent(owner.email) + '+status:open';
       },
 
       _ownerTitle: function(owner) {
@@ -153,7 +173,7 @@
       },
 
       _projectBranchURL: function(project, branch) {
-        return BASE_URL + '#/q/status:open+project:' + project + '+branch:' + branch;
+        return '/q/status:open+project:' + project + '+branch:' + branch;
       },
 
       _updatedString: function(updated) {
