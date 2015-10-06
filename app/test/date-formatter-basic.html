@@ -17,7 +17,7 @@
 
 <test-fixture id="basic">
   <template>
-    <date-formatter></date-formatter>
+    <date-formatter date-str="2015-09-24 23:30:17.033000000"></date-formatter>
   </template>
 </test-fixture>
 
@@ -29,8 +29,10 @@
       element = fixture('basic');
     });
 
-    test('', function() {
-
+    test('date is parsed correctly', function() {
+      assert.notOk((new Date('foo')).valueOf());
+      var d = element._parseDateStr(element.getAttribute('date-str'));
+      assert.isAbove(d.valueOf(), 0);
     });
 
   });

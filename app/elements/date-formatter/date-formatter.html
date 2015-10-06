@@ -1,5 +1,4 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<script src="../../bower_components/moment/moment.js"></script>
 
 <dom-module id="date-formatter">
   <template>
@@ -14,6 +13,16 @@
   (function() {
     'use strict';
 
+    var Duration = {
+      HOUR: 1000 * 60 * 60,
+      DAY: 1000 * 60 * 60 * 24,
+    };
+
+    var ShortMonthNames = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct',
+      'Nov', 'Dec'
+    ];
+
     Polymer({
       is: 'date-formatter',
 
@@ -25,24 +34,51 @@
         }
       },
 
-      _computeDateStr: function(dateStr) {
-        // Moment is used due to inconsistencies between browsers in parsing
-        // JSON-formatted dates.
-        var d = moment.utc(dateStr).local();
-        var now = moment();
-        var diff = now.diff(d, 'days');
-        if (diff < 1) {
-          // Is the day of the week different?
-          if (d.day() !== now.day()) {
-            return d.format('MMM D'); // 'Aug 29'
-          }
-          return d.format('h:mm A');  // '2:14 AM'
-        } else if (diff >= 1 <= 180) {
-          // From one to six months.
-          return d.format('MMM D');  // 'Aug 29'
+      _parseDateStr: function(dateStr) {
+        // Timestamps are given in UTC and have the format
+        // "'yyyy-mm-dd hh:mm:ss.fffffffff'" where "'ffffffffff'" represents
+        // nanoseconds.
+
+        // Munge the date into an ISO 8061 format and parse that.
+        return new Date(dateStr.replace(' ', 'T') + 'Z');
+      },
+
+      _computeDateStr: function(dateStr, opt_from) {
+        var d = this._parseDateStr(dateStr);
+        var from = opt_from || new Date();
+        var diff = from.getTime() - d.getTime();
+        console.log(d)
+        // Within 24 hours and on the same day:
+        // '2:14 AM'
+        if (diff < Duration.DAY && d.getDay() == from.getDay()) {
+          var pm = d.getHours() >= 12;
+          var hours = d.getHours() == 0 ? 12 :
+              pm ? d.getHours() - 12 : d.getHours();
+          var minutes = d.getMinutes() < 10 ? '0' + d.getMinutes() :
+              d.getMinutes();
+          return hours + ':' + minutes + (pm ? ' PM' : ' AM');
+        } else if (d.getDay() != from.getDay() || diff >= Duration.DAY) {
+
+        } else if (diff >= 180 * Duration.DAY) {
+          // More than six months:
+          // 'Aug 29, 1997'
+          return ShortMonthNames[d.getMonth()] + d.getDate() + ', '
         }
-        // More than six months.
-        return d.format('MMM D, YYYY'); // 'Aug 29, 1997'
+
+        // var diff = now.diff(d, 'days');
+        // if (diff < 1) {
+        //   // Is the day of the week different?
+        //   if (d.day() !== now.day()) {
+        //     return d.format('MMM D'); // 'Aug 29'
+        //   }
+        //   return d.format('h:mm A');  // '2:14 AM'
+        // } else if (diff >= 1 <= 180) {
+        //   // From one to six months.
+        //   return d.format('MMM D');  // 'Aug 29'
+        // }
+        // // More than six months.
+        // return d.format('MMM D, YYYY'); // 'Aug 29, 1997'
+
       },
     });
   })();
