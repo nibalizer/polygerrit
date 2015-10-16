@@ -23,9 +23,6 @@
 <body unresolved>
 <template is="dom-bind" id="app">
   <style>
-    gr-change-list {
-      margin: 0 20px;
-    }
     header {
       display: flex;
       align-items: center;
@@ -38,28 +35,14 @@
     .bigTitle:hover {
       text-decoration: underline;
     }
-    .searchContainer {
-      display: flex;
-      flex: 1;
-      justify-content: flex-end;
-    }
-    gr-search-bar {
-      width: 500px;
-    }
   </style>
   <header role="banner">
     <a href="/" class="bigTitle">PolyGerrit</a>
-    <div class="searchContainer">
-      <gr-search-bar value="[[params.query]]" roll="search"></gr-search-bar>
-    </div>
   </header>
-  <gr-change-list query="[[params.query]]" roll="main"></gr-change-list>
+  <gr-diff></gr-diff>
   <footer roll="contentinfo">Powered by PolyGerrit</footer>
 </template>
 
 <!-- build:js scripts/app.js -->
 <script src="scripts/app.js"></script>
 <!-- endbuild-->
-
-
-

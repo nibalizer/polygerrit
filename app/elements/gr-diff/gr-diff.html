@@ -1,0 +1,63 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="gr-diff">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      table {
+        font-family: monospace;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      .removedLine {
+        background-color: #fee;
+      }
+      .addedLine {
+        background-color: #efe;
+      }
+    </style>
+    <iron-ajax
+        auto
+        url="/diff.json"
+        handle-as="text"
+        on-response="_handleResponse"
+        debounce-duration="300"></iron-ajax>
+    <table>
+      <template is="dom-repeat" items="[[diff.content]]" as="cols">
+        <template is="dom-if" if="[[cols.ab]]">
+          <template is="dom-repeat" items="[[cols.ab]]" as="line">
+            <tr><td>[[line]]</td><td>[[line]]</td></tr>
+          </template>
+        </template>
+        <template is="dom-if" if="[[cols.a]]">
+          <template is="dom-repeat" items="[[cols.a]]" as="line">
+            <tr><td class="removedLine">[[line]]</td><td></td></tr>
+          </template>
+        </template>
+        <template is="dom-if" if="[[cols.b]]">
+          <template is="dom-repeat" items="[[cols.b]]" as="line">
+            <tr><td></td><td class="addedLine">[[line]]</td></tr>
+          </template>
+        </template>
+      </template>
+    </table>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'gr-diff',
+
+      properties: {
+      },
+
+      _handleResponse: function(e, req) {
+        this.diff = JSON.parse(req.response.substring(')]}\''.length));
+      },
+    });
+  })();
+  </script>
+</dom-module>

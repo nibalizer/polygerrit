@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+<title>gr-date-formatter</title>
+
+<script src="../../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+<script src="../../bower_components/web-component-tester/browser.js"></script>
+<script src="../../bower_components/test-fixture/test-fixture-mocha.js"></script>
+<link rel="import" href="../../bower_components/test-fixture/test-fixture.html">
+
+<link rel="import" href="../elements/gr-date-formatter/gr-date-formatter.html">
+
+<test-fixture id="basic">
+  <template>
+    <gr-date-formatter date-str="2015-09-24 23:30:17.033000000"></gr-date-formatter>
+  </template>
+</test-fixture>
+
+<script>
+  suite('gr-date-formatter tests', function() {
+    var element;
+
+    setup(function() {
+      element = fixture('basic');
+    });
+
+    test('date is parsed correctly', function() {
+      assert.notOk((new Date('foo')).valueOf());
+      var d = element._parseDateStr(element.getAttribute('date-str'));
+      assert.isAbove(d.valueOf(), 0);
+    });
+
+  });
+</script>

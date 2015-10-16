@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<dom-module id="change-list">
+<dom-module id="gr-change-list">
   <template>
     <style>
       :host {
@@ -72,7 +72,7 @@
         <th title="Library-Compliance">LC</th>
         <th title="Verified">V</th>
       </tr>
-      <template id="changeList" is="dom-repeat" items="{{changes}}" as="change">
+      <template is="dom-repeat" items="{{changes}}" as="change">
         <tr class$="{{_computeItemClass(index)}}">
           <td>
             <span class="positionIndicator">&#x25b6;</span>
@@ -91,7 +91,7 @@
           <td>
             <a href$="[[_projectBranchURL(change.project, change.branch)]]">[[change.branch]]</a>
           </td>
-          <td><date-formatter date-str="[[change.updated]]"></date-formatter></td>
+          <td><gr-date-formatter date-str="[[change.updated]]"></gr-date-formatter></td>
           <td>Size</td>
           <td title="Code-Review">CR</td>
           <td title="Library-Compliance">LC</td>
@@ -107,7 +107,7 @@
     var BASE_URL = 'https://gerrit-review.googlesource.com/';
 
     Polymer({
-      is: 'change-list',
+      is: 'gr-change-list',
 
       properties: {
         /**
