@@ -10,7 +10,7 @@
       }
       table {
         border-collapse: collapse;
-        font-family: monospace;
+        font-family: 'Source Code Pro', monospace;
         white-space: pre-wrap;
         word-wrap: break-word;
       }
@@ -134,7 +134,6 @@
 
       _highlightedHTML: function(html) {
         var result = hljs.highlight('html', html, true);
-        // console.log(result)
         return result.value;
       },
 
