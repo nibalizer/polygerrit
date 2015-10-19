@@ -1,15 +1,34 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="./gr-diff-code-theme.html">
+<script src="../../lib/highlight/highlight.pack.js"></script>
 
 <dom-module id="gr-diff">
   <template>
-    <style>
+    <style include="gr-diff-code-theme">
       :host {
         display: block;
       }
       table {
+        border-collapse: collapse;
         font-family: monospace;
         white-space: pre-wrap;
         word-wrap: break-word;
+      }
+      td {
+        vertical-align: top;
+      }
+      .lineNum {
+        border-right: 1px solid #ddd;
+        color: #aaa;
+        cursor: pointer;
+        padding-right: 10px;
+        text-align: right;
+      }
+      .lineNum:hover {
+        text-decoration: underline;
+      }
+      td:not(.lineNum) {
+        padding-left: 5px;
       }
       .removedLine {
         background-color: #fee;
@@ -24,25 +43,7 @@
         handle-as="text"
         on-response="_handleResponse"
         debounce-duration="300"></iron-ajax>
-    <table>
-      <template is="dom-repeat" items="[[diff.content]]" as="cols">
-        <template is="dom-if" if="[[cols.ab]]">
-          <template is="dom-repeat" items="[[cols.ab]]" as="line">
-            <tr><td>[[line]]</td><td>[[line]]</td></tr>
-          </template>
-        </template>
-        <template is="dom-if" if="[[cols.a]]">
-          <template is="dom-repeat" items="[[cols.a]]" as="line">
-            <tr><td class="removedLine">[[line]]</td><td></td></tr>
-          </template>
-        </template>
-        <template is="dom-if" if="[[cols.b]]">
-          <template is="dom-repeat" items="[[cols.b]]" as="line">
-            <tr><td></td><td class="addedLine">[[line]]</td></tr>
-          </template>
-        </template>
-      </template>
-    </table>
+    <table id="diffTable"></table>
   </template>
   <script>
   (function() {
@@ -51,12 +52,92 @@
     Polymer({
       is: 'gr-diff',
 
-      properties: {
-      },
+      properties: {},
 
       _handleResponse: function(e, req) {
-        this.diff = JSON.parse(req.response.substring(')]}\''.length));
+        var diff = JSON.parse(req.response.substring(')]}\''.length));
+        this._constructDOM(diff);
       },
+
+      _constructDOM: function(diff) {
+        if (!diff.content) { return; }
+
+        var lineNum = 0 + (diff.content.skip || 0);
+        for (var i = 0; i < diff.content.length; i++) {
+          var diffChunk = diff.content[i];
+          if (diffChunk.ab) {
+            for (var j = 0; j < diffChunk.ab.length; j++) {
+              this._addRow(++lineNum, diffChunk.ab[j], diffChunk.ab[j], false);
+            }
+            continue;
+          }
+          if (diffChunk.a || diffChunk.b) {
+            var maxLen = Math.max(diffChunk.a && diffChunk.a.length,
+                diffChunk.b && diffChunk.b.length);
+            for (var j = 0; j < maxLen; j++) {
+              var leftContent;
+              if (diffChunk.a && j < diffChunk.a.length) {
+                leftContent = diffChunk.a[j];
+              }
+              var rightContent;
+              if (diffChunk.b && j < diffChunk.b.length) {
+                rightContent = diffChunk.b[j];
+              }
+              this._addRow(++lineNum, leftContent, rightContent, true);
+            }
+          }
+        }
+      },
+
+      _addRow: function(lineNum, leftContent, rightContent, highlight) {
+        var rowEl = document.createElement('tr');
+        var leftLineNumEl = document.createElement('td');
+        var rightLineNumEl = document.createElement('td');
+        var leftColEl = document.createElement('td');
+        var rightColEl = document.createElement('td');
+
+        Polymer.dom(leftLineNumEl).classList.add('lineNum');
+        Polymer.dom(rightLineNumEl).classList.add('lineNum');
+        Polymer.dom(leftLineNumEl).textContent = lineNum;
+        Polymer.dom(rightLineNumEl).textContent = lineNum;
+
+        var leftHTML = this._highlightedHTML(leftContent);
+        var rightHTML;
+        if (leftContent == rightContent) {
+          rightHTML = leftHTML;
+        } else {
+          rightHTML = this._highlightedHTML(rightContent);
+        }
+        // If the html is just the text then it didn't get highlighted.
+        // Use textContent which is faster than innerHTML.
+        if (leftContent == leftHTML) {
+          Polymer.dom(leftColEl).textContent = leftContent;
+        } else {
+          Polymer.dom(leftColEl).innerHTML = leftHTML;
+        }
+        if (rightContent == rightHTML) {
+          Polymer.dom(rightColEl).textContent = rightContent;
+        } else {
+          Polymer.dom(rightColEl).innerHTML = rightHTML;
+        }
+
+        if (highlight) {
+          Polymer.dom(leftColEl).classList.add('removedLine');
+          Polymer.dom(rightColEl).classList.add('addedLine');
+        }
+        Polymer.dom(rowEl).appendChild(leftLineNumEl);
+        Polymer.dom(rowEl).appendChild(leftColEl);
+        Polymer.dom(rowEl).appendChild(rightLineNumEl);
+        Polymer.dom(rowEl).appendChild(rightColEl);
+        Polymer.dom(this.$.diffTable).appendChild(rowEl);
+      },
+
+      _highlightedHTML: function(html) {
+        var result = hljs.highlight('html', html, true);
+        // console.log(result)
+        return result.value;
+      },
+
     });
   })();
   </script>

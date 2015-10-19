@@ -11,7 +11,8 @@
     "page": "visionmedia/page.js#~1.6.3",
     "iron-ajax": "PolymerElements/iron-ajax#~1.0.5",
     "iron-a11y-keys": "PolymerElements/iron-a11y-keys#~1.0.2",
-    "iron-input": "PolymerElements/iron-input#~1.0.6"
+    "iron-input": "PolymerElements/iron-input#~1.0.6",
+    "sugar": "sugarjs#~1.4.1"
   },
   "devDependencies": {
     "web-component-tester": "*",
