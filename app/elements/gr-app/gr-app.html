@@ -1,0 +1,68 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="gr-app">
+  <template>
+    <style>
+      gr-change-list {
+        margin: 0 20px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+      }
+      .bigTitle {
+        color: #000;
+        font-size: 24px;
+        text-decoration: none;
+      }
+      .bigTitle:hover {
+        text-decoration: underline;
+      }
+      .searchContainer {
+        display: flex;
+        flex: 1;
+        justify-content: flex-end;
+      }
+      gr-search-bar {
+        width: 500px;
+      }
+    </style>
+    <header role="banner">
+      <a href="/" class="bigTitle">PolyGerrit</a>
+      <div class="searchContainer">
+        <gr-search-bar value="[[params.query]]" role="search"></gr-search-bar>
+      </div>
+    </header>
+    <template is="dom-if" if="{{_showChangeList}}">
+      <gr-change-list query="[[params.query]]" role="main"></gr-change-list>
+    </template>
+    <template is="dom-if" if="{{_showDiffView}}">
+      <gr-diff></gr-diff>
+    </template>
+    <footer role="contentinfo">Powered by PolyGerrit</footer>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'gr-app',
+
+      properties: {
+        params: Object,
+
+        route: {
+          type: Object,
+          value: {},
+          observer: '_routeChanged',
+        }
+      },
+
+      _routeChanged: function(route) {
+        this.set('_showChangeList', route == 'gr-change-list');
+        this.set('_showDiffView', route == 'gr-diff');
+      },
+    });
+  })();
+  </script>
+</dom-module>

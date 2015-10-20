@@ -94,12 +94,13 @@
         var leftLineNumEl = document.createElement('td');
         var rightLineNumEl = document.createElement('td');
         var leftColEl = document.createElement('td');
+        leftColEl.className = 'style-scope gr-diff'
         var rightColEl = document.createElement('td');
-
-        Polymer.dom(leftLineNumEl).classList.add('lineNum');
-        Polymer.dom(rightLineNumEl).classList.add('lineNum');
-        Polymer.dom(leftLineNumEl).textContent = lineNum;
-        Polymer.dom(rightLineNumEl).textContent = lineNum;
+        rightColEl.className = 'style-scope gr-diff'
+        leftLineNumEl.className = 'style-scope gr-diff lineNum';
+        rightLineNumEl.className = 'style-scope gr-diff lineNum';
+        leftLineNumEl.textContent = lineNum;
+        rightLineNumEl.textContent = lineNum;
 
         var leftHTML = this._highlightedHTML(leftContent);
         var rightHTML;
@@ -111,25 +112,25 @@
         // If the html is just the text then it didn't get highlighted.
         // Use textContent which is faster than innerHTML.
         if (leftContent == leftHTML) {
-          Polymer.dom(leftColEl).textContent = leftContent;
+          leftColEl.textContent = leftContent;
         } else {
-          Polymer.dom(leftColEl).innerHTML = leftHTML;
+          leftColEl.innerHTML = leftHTML;
         }
         if (rightContent == rightHTML) {
-          Polymer.dom(rightColEl).textContent = rightContent;
+          rightColEl.textContent = rightContent;
         } else {
-          Polymer.dom(rightColEl).innerHTML = rightHTML;
+          rightColEl.innerHTML = rightHTML;
         }
 
         if (highlight) {
-          Polymer.dom(leftColEl).classList.add('removedLine');
-          Polymer.dom(rightColEl).classList.add('addedLine');
+          leftColEl.classList.add('removedLine');
+          rightColEl.classList.add('addedLine');
         }
-        Polymer.dom(rowEl).appendChild(leftLineNumEl);
-        Polymer.dom(rowEl).appendChild(leftColEl);
-        Polymer.dom(rowEl).appendChild(rightLineNumEl);
-        Polymer.dom(rowEl).appendChild(rightColEl);
-        Polymer.dom(this.$.diffTable).appendChild(rowEl);
+        rowEl.appendChild(leftLineNumEl);
+        rowEl.appendChild(leftColEl);
+        rowEl.appendChild(rightLineNumEl);
+        rowEl.appendChild(rightColEl);
+        this.$.diffTable.appendChild(rowEl);
       },
 
       _highlightedHTML: function(html) {

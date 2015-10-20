@@ -17,6 +17,11 @@ window.addEventListener('WebComponentsReady', function() {
     app.params = data.params;
   });
 
+  page('/c', scrollToTop, function(data) {
+    app.route = 'gr-diff';
+    app.params = data.params;
+  });
+
   page({
     hashbang: true
   });

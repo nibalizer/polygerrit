@@ -15,13 +15,6 @@
 
 <script src="bower_components/sugar/release/sugar-full.min.js"></script>
 
-<!-- Use Shadow DOM where supported.
-     https://www.polymer-project.org/1.0/docs/devguide/settings.html -->
-<script>
-window.Polymer = window.Polymer || {};
-window.Polymer.dom = 'shadow';
-</script>
-
 <!-- will be replaced with elements/elements.vulcanized.html -->
 <link rel="import" href="elements/elements.html">
 <!-- endreplace-->
@@ -31,39 +24,7 @@ window.Polymer.dom = 'shadow';
 
 <body unresolved>
 <template is="dom-bind" id="app">
-  <style>
-    gr-change-list {
-      margin: 0 20px;
-    }
-    header {
-      display: flex;
-      align-items: center;
-    }
-    .bigTitle {
-      color: #000;
-      font-size: 24px;
-      text-decoration: none;
-    }
-    .bigTitle:hover {
-      text-decoration: underline;
-    }
-    .searchContainer {
-      display: flex;
-      flex: 1;
-      justify-content: flex-end;
-    }
-    gr-search-bar {
-      width: 500px;
-    }
-  </style>
-  <header role="banner">
-    <a href="/" class="bigTitle">PolyGerrit</a>
-    <div class="searchContainer">
-      <gr-search-bar value="[[params.query]]" roll="search"></gr-search-bar>
-    </div>
-  </header>
-  <gr-change-list query="[[params.query]]" roll="main"></gr-change-list>
-  <footer roll="contentinfo">Powered by PolyGerrit</footer>
+  <gr-app params="{{params}}" route="{{route}}"></gr-app>
 </template>
 
 <!-- build:js scripts/app.js -->

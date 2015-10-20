@@ -47,12 +47,11 @@
         var d = this._parseDateStr(dateStr);
         var from = opt_from || new Date();
         var diff = from.getTime() - d.getTime();
-        console.log(d)
         // Within 24 hours and on the same day:
         // '2:14 AM'
         if (diff < Duration.DAY && d.getDay() == from.getDay()) {
           var pm = d.getHours() >= 12;
-          var hours = d.getHours() == 0 ? 12 :
+          var hours = d.getHours() === 0 ? 12 :
               pm ? d.getHours() - 12 : d.getHours();
           var minutes = d.getMinutes() < 10 ? '0' + d.getMinutes() :
               d.getMinutes();
@@ -62,7 +61,7 @@
         } else if (diff >= 180 * Duration.DAY) {
           // More than six months:
           // 'Aug 29, 1997'
-          return ShortMonthNames[d.getMonth()] + d.getDate() + ', '
+          return ShortMonthNames[d.getMonth()] + d.getDate() + ', ';
         }
 
         // var diff = now.diff(d, 'days');

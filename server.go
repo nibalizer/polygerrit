@@ -1,11 +1,16 @@
 package main
 
 import (
+	"bufio"
+	"compress/gzip"
+	"errors"
 	"flag"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 func main() {
@@ -50,9 +55,38 @@ func handleChanges(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type gzipResponseWriter struct {
+	io.WriteCloser
+	http.ResponseWriter
+}
+
+func newGzipResponseWriter(w http.ResponseWriter) *gzipResponseWriter {
+	gz := gzip.NewWriter(w)
+	return &gzipResponseWriter{WriteCloser: gz, ResponseWriter: w}
+}
+
+func (w gzipResponseWriter) Write(b []byte) (int, error) {
+	return w.WriteCloser.Write(b)
+}
+
+func (w gzipResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	h, ok := w.ResponseWriter.(http.Hijacker)
+	if !ok {
+		return nil, nil, errors.New("gzipResponseWriter: ResponseWriter does not satisfy http.Hijacker interface")
+	}
+	return h.Hijack()
+}
+
 type server struct{}
 
 func (_ *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s %s %s %s\n", r.Proto, r.Method, r.RemoteAddr, r.URL)
-	http.DefaultServeMux.ServeHTTP(w, r)
+	if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+		http.DefaultServeMux.ServeHTTP(w, r)
+		return
+	}
+	w.Header().Set("Content-Encoding", "gzip")
+	gzw := newGzipResponseWriter(w)
+	defer gzw.Close()
+	http.DefaultServeMux.ServeHTTP(gzw, r)
 }
