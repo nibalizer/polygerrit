@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="./gr-diff-code-theme.html">
-<script src="../../lib/highlight/highlight.pack.js"></script>
+<!-- <script src="../../lib/highlight/highlight.pack.js"></script> -->
 
 <dom-module id="gr-diff">
   <template>
@@ -94,9 +94,9 @@
         var leftLineNumEl = document.createElement('td');
         var rightLineNumEl = document.createElement('td');
         var leftColEl = document.createElement('td');
-        leftColEl.className = 'style-scope gr-diff'
+        leftColEl.className = 'style-scope gr-diff';
         var rightColEl = document.createElement('td');
-        rightColEl.className = 'style-scope gr-diff'
+        rightColEl.className = 'style-scope gr-diff';
         leftLineNumEl.className = 'style-scope gr-diff lineNum';
         rightLineNumEl.className = 'style-scope gr-diff lineNum';
         leftLineNumEl.textContent = lineNum;

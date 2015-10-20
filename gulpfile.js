@@ -36,13 +36,13 @@ var styleTask = function (stylesPath, srcs) {
     .pipe($.size({title: stylesPath}));
 };
 
-var jshintTask = function (src) {
-  return gulp.src(src)
-    .pipe($.jshint.extract()) // Extract JS from .html files
-    .pipe($.jshint())
-    .pipe($.jshint.reporter('jshint-stylish'))
-    .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
-};
+// var jshintTask = function (src) {
+//   return gulp.src(src)
+//     .pipe($.jshint.extract()) // Extract JS from .html files
+//     .pipe($.jshint())
+//     .pipe($.jshint.reporter('jshint-stylish'))
+//     .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
+// };
 
 var imageOptimizeTask = function (src, dest) {
   return gulp.src(src)
@@ -88,19 +88,19 @@ gulp.task('elements', function () {
   return styleTask('elements', ['**/*.css']);
 });
 
-// Lint JavaScript
-gulp.task('jshint', function () {
-  return jshintTask([
-      'app/scripts/**/*.js',
-      'app/elements/**/*.js',
-      'app/elements/**/*.html',
-      'gulpfile.js'
-    ])
-    .pipe($.jshint.extract()) // Extract JS from .html files
-    .pipe($.jshint())
-    .pipe($.jshint.reporter('jshint-stylish'))
-    .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
-});
+// // Lint JavaScript
+// gulp.task('jshint', function () {
+//   return jshintTask([
+//       'app/scripts/**/*.js',
+//       'app/elements/**/*.js',
+//       'app/elements/**/*.html',
+//       'gulpfile.js'
+//     ])
+//     .pipe($.jshint.extract()) // Extract JS from .html files
+//     .pipe($.jshint())
+//     .pipe($.jshint.reporter('jshint-stylish'))
+//     .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
+// });
 
 // Optimize images
 gulp.task('images', function () {
@@ -202,7 +202,7 @@ gulp.task('serve', ['styles', 'elements', 'images'], function () {
   gulp.watch(['app/**/*.html'], reload);
   gulp.watch(['app/styles/**/*.css'], ['styles', reload]);
   gulp.watch(['app/elements/**/*.css'], ['elements', reload]);
-  gulp.watch(['app/{scripts,elements}/**/{*.js,*.html}'], ['jshint']);
+  // gulp.watch(['app/{scripts,elements}/**/{*.js,*.html}'], ['jshint']);
   gulp.watch(['app/images/**/*'], reload);
 });
 
@@ -235,7 +235,7 @@ gulp.task('default', ['clean'], function (cb) {
   runSequence(
     ['copy', 'styles'],
     'elements',
-    ['jshint', 'images', 'fonts', 'html'],
+    ['images', 'fonts', 'html'],
     'vulcanize','rename-index', // 'cache-config',
     cb);
 });
