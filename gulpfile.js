@@ -10,7 +10,6 @@ var reload = browserSync.reload;
 var merge = require('merge-stream');
 var path = require('path');
 var historyApiFallback = require('connect-history-api-fallback');
-var polybuild = require('polybuild');
 
 var AUTOPREFIXER_BROWSERS = [
   'ie >= 10',
@@ -35,14 +34,6 @@ var styleTask = function (stylesPath, srcs) {
     .pipe(gulp.dest('dist/' + stylesPath))
     .pipe($.size({title: stylesPath}));
 };
-
-// var jshintTask = function (src) {
-//   return gulp.src(src)
-//     .pipe($.jshint.extract()) // Extract JS from .html files
-//     .pipe($.jshint())
-//     .pipe($.jshint.reporter('jshint-stylish'))
-//     .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
-// };
 
 var imageOptimizeTask = function (src, dest) {
   return gulp.src(src)
@@ -88,20 +79,6 @@ gulp.task('elements', function () {
   return styleTask('elements', ['**/*.css']);
 });
 
-// // Lint JavaScript
-// gulp.task('jshint', function () {
-//   return jshintTask([
-//       'app/scripts/**/*.js',
-//       'app/elements/**/*.js',
-//       'app/elements/**/*.html',
-//       'gulpfile.js'
-//     ])
-//     .pipe($.jshint.extract()) // Extract JS from .html files
-//     .pipe($.jshint())
-//     .pipe($.jshint.reporter('jshint-stylish'))
-//     .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
-// });
-
 // Optimize images
 gulp.task('images', function () {
   return imageOptimizeTask('app/images/**/*', 'dist/images');
@@ -115,6 +92,10 @@ gulp.task('copy', function () {
   ], {
     dot: true
   }).pipe(gulp.dest('dist'));
+
+  var lib = gulp.src([
+    'lib/**/*'
+  ]).pipe(gulp.dest('dist/lib'));
 
   var bower = gulp.src([
     'bower_components/**/*'
@@ -147,24 +128,17 @@ gulp.task('html', function () {
     'dist');
 });
 
-// Polybuild will take care of inlining HTML imports,
-// scripts and CSS for you.
+// Vulcanize granular configuration.
 gulp.task('vulcanize', function () {
-  return gulp.src('dist/index.html')
-    .pipe(polybuild({maximumCrush: true}))
-    .pipe(gulp.dest('dist/'));
-});
-
-// If you require more granular configuration of Vulcanize
-// than polybuild provides, follow instructions from readme at:
-// https://github.com/PolymerElements/polymer-starter-kit/#if-you-require-more-granular-configuration-of-vulcanize-than-polybuild-provides-you-an-option-by
-
-// Rename Polybuild's index.build.html to index.html
-gulp.task('rename-index', function () {
-  gulp.src('dist/index.build.html')
-    .pipe($.rename('index.html'))
-    .pipe(gulp.dest('dist/'));
-  return del(['dist/index.build.html']);
+  var DEST_DIR = 'dist/elements';
+  return gulp.src('dist/elements/elements.vulcanized.html')
+    .pipe($.vulcanize({
+      stripComments: true,
+      inlineCss: true,
+      inlineScripts: true
+    }))
+    .pipe(gulp.dest(DEST_DIR))
+    .pipe($.size({title: 'vulcanize'}));
 });
 
 // Clean output directory
@@ -231,12 +205,12 @@ gulp.task('serve:dist', ['default'], function () {
 
 // Build production files, the default task
 gulp.task('default', ['clean'], function (cb) {
-  // Uncomment 'cache-config' after 'rename-index' if you are going to use service workers.
+  // Uncomment 'cache-config' if you are going to use service workers.
   runSequence(
     ['copy', 'styles'],
     'elements',
     ['images', 'fonts', 'html'],
-    'vulcanize','rename-index', // 'cache-config',
+    'vulcanize', // 'cache-config',
     cb);
 });
 

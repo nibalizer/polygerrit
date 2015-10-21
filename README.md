@@ -1,20 +1,7 @@
-Thanks for installing Buck!
+# Polygerrit
 
-In this quickstart project, the file apps/myapp/BUCK defines the build rules. 
+```sh
+go run server.go
+```
 
-At this point, you should move into the project directory and try running:
-
-    buck build //apps/myapp:app
-
-or:
-
-    buck build app
-
-See .buckconfig for a full list of aliases.
-
-If you have an Android device connected to your computer, you can also try:
-
-    buck install app
-
-This information is located in the file README.md if you need to access it
-later.
+Then visit http://localhost:8081
