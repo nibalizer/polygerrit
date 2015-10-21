@@ -13,7 +13,12 @@
 <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 <!-- endbuild -->
 
-<script src="../lib/highlight/highlight.pack.js"></script>
+<!-- Use Shadow DOM where supported.
+     https://www.polymer-project.org/1.0/docs/devguide/settings.html -->
+<script>
+window.Polymer = window.Polymer || {};
+window.Polymer.dom = 'shadow';
+</script>
 
 <!-- will be replaced with elements/elements.vulcanized.html -->
 <link rel="import" href="elements/elements.html">
@@ -30,6 +35,3 @@
 <!-- build:js scripts/app.js -->
 <script src="scripts/app.js"></script>
 <!-- endbuild-->
-
-
-
