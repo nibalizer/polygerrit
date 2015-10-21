@@ -1,6 +1,8 @@
-# Polygerrit
+# PolyGerrit
 
 ```sh
+npm install
+bower install
 go run server.go
 ```
 
