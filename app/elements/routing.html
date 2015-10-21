@@ -12,10 +12,13 @@ window.addEventListener('WebComponentsReady', function() {
     page.redirect('/q/status:open');
   });
 
-  page('/q/:query', scrollToTop, function(data) {
+  function queryHandler(data) {
     app.route = 'gr-change-list';
     app.params = data.params;
-  });
+  }
+
+  page('/q/:query,:offset', scrollToTop, queryHandler);
+  page('/q/:query', scrollToTop, queryHandler);
 
   page('/c', scrollToTop, function(data) {
     app.route = 'gr-diff';

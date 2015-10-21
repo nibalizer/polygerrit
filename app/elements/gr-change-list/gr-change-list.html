@@ -50,7 +50,7 @@
     <iron-ajax
         auto
         url="/changes/"
-        params="{{_computeQueryParams(query)}}"
+        params="{{_computeQueryParams(query, offset)}}"
         handle-as="text"
         on-response="_handleResponse"
         debounce-duration="300"></iron-ajax>
@@ -99,6 +99,10 @@
         </tr>
       </template>
     </table>
+    <nav>
+      <a href$="{{_computeNavLink(query, offset, -1)}}">&larr; Prev</a>
+      <a href$="{{_computeNavLink(query, offset, 1)}}">Next &rarr;</a>
+    </nav>
   </template>
   <script>
   (function() {
@@ -136,6 +140,14 @@
           type: Number,
           value: 0,
           observer: '_selectedIndexChanged'
+        },
+
+        /**
+         * The offset of results to return from the API.
+         */
+        offset: {
+          type: Number,
+          value: 0,
         }
       },
 
@@ -155,16 +167,26 @@
         return classes.join(' ');
       },
 
-      _computeQueryParams: function(query) {
+      _computeQueryParams: function(query, offset) {
         var obj = {
           n: 25,  // Number of results to return.
           O: 81,  // Include owner information.
-          S: 0,   // Offset for results.
+          S: offset || 0,
         };
         if (query && query.length > 0) {
           obj.q = query;
         }
         return obj;
+      },
+
+      _computeNavLink: function(query, offset, direction) {
+        if (!query) { return '#/'; }
+
+        // Offset could be a string when passed from the router.
+        offset = +(offset || 0);
+        console.log(direction, query, offset)
+        var newOffset = Math.max(0, offset + (25 * direction));
+        return '/q/' + query + ',' + newOffset;
       },
 
       _handleResponse: function(e, req) {
