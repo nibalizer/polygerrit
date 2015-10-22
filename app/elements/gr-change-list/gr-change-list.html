@@ -47,7 +47,7 @@
       }
       nav {
         padding: 10px 0;
-        text-align: right;
+        text-align: center;
       }
       nav a {
         display: inline-block;
@@ -86,7 +86,7 @@
         <th title="Verified">V</th>
       </tr>
       <template is="dom-repeat" items="{{changes}}" as="change">
-        <tr class$="{{_computeItemClass(index)}}">
+        <tr class$="[[_computeItemClass(index)]]">
           <td>
             <span class="positionIndicator">&#x25b6;</span>
           </td>
@@ -113,8 +113,8 @@
       </template>
     </table>
     <nav>
-      <a href$="{{_computeNavLink(query, offset, -1)}}" hidden$="[[_hidePrevArrow(offset)]]">&larr; Prev</a>
-      <a href$="{{_computeNavLink(query, offset, 1)}}" hidden$="[[_hideNextArrow(changes.length)]]">Next &rarr;</a>
+      <a href$="[[_computeNavLink(query, offset, -1)]]" hidden$="[[_hidePrevArrow(offset)]]">&larr; Prev</a>
+      <a href$="[[_computeNavLink(query, offset, 1)]]" hidden$="[[_hideNextArrow(changes.length)]]">Next &rarr;</a>
     </nav>
   </template>
   <script>
@@ -201,12 +201,10 @@
       },
 
       _hidePrevArrow: function(offset) {
-        console.log('hide prev arrow', offset)
         return offset == 0;
       },
 
       _hideNextArrow: function(changesLen) {
-        console.log('changeslen', changesLen)
         return changesLen < DEFAULT_NUM_CHANGES;
       },
 

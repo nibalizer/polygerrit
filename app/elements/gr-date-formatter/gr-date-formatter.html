@@ -7,7 +7,7 @@
         display: inline;
       }
     </style>
-    <span>{{_computeDateStr(dateStr)}}</span>
+    <span>[[_computeDateStr(dateStr)]]</span>
   </template>
   <script>
   (function() {
@@ -34,41 +34,42 @@
         }
       },
 
+      _computeDateStr: function(dateStr) {
+        return this._dateStr(this._parseDateStr(dateStr), new Date());
+      },
+
       _parseDateStr: function(dateStr) {
         // Timestamps are given in UTC and have the format
         // "'yyyy-mm-dd hh:mm:ss.fffffffff'" where "'ffffffffff'" represents
         // nanoseconds.
-
         // Munge the date into an ISO 8061 format and parse that.
         return new Date(dateStr.replace(' ', 'T') + 'Z');
       },
 
-      _computeDateStr: function(dateStr, opt_from) {
-        var d = this._parseDateStr(dateStr);
-        var from = opt_from || new Date();
-        var diff = from.getTime() - d.getTime();
-
-        if (diff < Duration.DAY && d.getDay() == from.getDay()) {
+      _dateStr: function(t, now) {
+        var diff = now.getTime() - t.getTime();
+        if (diff < Duration.DAY && t.getDay() == now.getDay()) {
           // Within 24 hours and on the same day:
           // '2:14 AM'
-          var pm = d.getHours() >= 12;
-          var hours = d.getHours() === 0 ? 12 :
-              pm ? d.getHours() - 12 : d.getHours();
-          var minutes = d.getMinutes() < 10 ? '0' + d.getMinutes() :
-              d.getMinutes();
+          var pm = t.getHours() >= 12;
+          var hours = t.getHours() === 0 ? 12 :
+              pm ? t.getHours() - 12 : t.getHours();
+          var minutes = t.getMinutes() < 10 ? '0' + t.getMinutes() :
+              t.getMinutes();
           return hours + ':' + minutes + (pm ? ' PM' : ' AM');
-        } else if ((d.getDay() != from.getDay() || diff >= Duration.DAY) &&
+        } else if ((t.getDay() != now.getDay() || diff >= Duration.DAY) &&
                    diff < 180 * Duration.DAY) {
           // From one to six months:
           // 'Aug 29'
-          return ShortMonthNames[d.getMonth()] + ' ' + d.getDate();
+          return ShortMonthNames[t.getMonth()] + ' ' + t.getDate();
         } else if (diff >= 180 * Duration.DAY) {
           // More than six months:
           // 'Aug 29, 1997'
-          return ShortMonthNames[d.getMonth()] + ' ' + d.getDate() + ', ' +
-              d.getFullYear();
+          return ShortMonthNames[t.getMonth()] + ' ' + t.getDate() + ', ' +
+              t.getFullYear();
         }
       },
+
     });
   })();
   </script>
