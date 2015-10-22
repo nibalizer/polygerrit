@@ -47,37 +47,27 @@
         var d = this._parseDateStr(dateStr);
         var from = opt_from || new Date();
         var diff = from.getTime() - d.getTime();
-        // Within 24 hours and on the same day:
-        // '2:14 AM'
+
         if (diff < Duration.DAY && d.getDay() == from.getDay()) {
+          // Within 24 hours and on the same day:
+          // '2:14 AM'
           var pm = d.getHours() >= 12;
           var hours = d.getHours() === 0 ? 12 :
               pm ? d.getHours() - 12 : d.getHours();
           var minutes = d.getMinutes() < 10 ? '0' + d.getMinutes() :
               d.getMinutes();
           return hours + ':' + minutes + (pm ? ' PM' : ' AM');
-        } else if (d.getDay() != from.getDay() || diff >= Duration.DAY) {
-
+        } else if ((d.getDay() != from.getDay() || diff >= Duration.DAY) &&
+                   diff < 180 * Duration.DAY) {
+          // From one to six months:
+          // 'Aug 29'
+          return ShortMonthNames[d.getMonth()] + ' ' + d.getDate();
         } else if (diff >= 180 * Duration.DAY) {
           // More than six months:
           // 'Aug 29, 1997'
-          return ShortMonthNames[d.getMonth()] + d.getDate() + ', ';
+          return ShortMonthNames[d.getMonth()] + ' ' + d.getDate() + ', ' +
+              d.getFullYear();
         }
-
-        // var diff = now.diff(d, 'days');
-        // if (diff < 1) {
-        //   // Is the day of the week different?
-        //   if (d.day() !== now.day()) {
-        //     return d.format('MMM D'); // 'Aug 29'
-        //   }
-        //   return d.format('h:mm A');  // '2:14 AM'
-        // } else if (diff >= 1 <= 180) {
-        //   // From one to six months.
-        //   return d.format('MMM D');  // 'Aug 29'
-        // }
-        // // More than six months.
-        // return d.format('MMM D, YYYY'); // 'Aug 29, 1997'
-
       },
     });
   })();

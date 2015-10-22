@@ -38,7 +38,7 @@
       </div>
     </header>
     <template is="dom-if" if="{{_showChangeList}}">
-      <gr-change-list query="[[params.query]]" offset="[[params.offset]]" role="main"></gr-change-list>
+      <gr-change-list params="[[params]]" role="main"></gr-change-list>
     </template>
     <template is="dom-if" if="{{_showDiffView}}">
       <gr-diff role="main"></gr-diff>

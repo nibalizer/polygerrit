@@ -45,6 +45,19 @@
         vertical-align: -4px;
         width: 16px;
       }
+      nav {
+        padding: 10px 0;
+        text-align: right;
+      }
+      nav a {
+        display: inline-block;
+      }
+      nav a:first-of-type {
+        margin-right: 10px;
+      }
+      [hidden] {
+        display: none !important;
+      }
     </style>
 
     <iron-ajax
@@ -100,8 +113,8 @@
       </template>
     </table>
     <nav>
-      <a href$="{{_computeNavLink(query, offset, -1)}}">&larr; Prev</a>
-      <a href$="{{_computeNavLink(query, offset, 1)}}">Next &rarr;</a>
+      <a href$="{{_computeNavLink(query, offset, -1)}}" hidden$="[[_hidePrevArrow(offset)]]">&larr; Prev</a>
+      <a href$="{{_computeNavLink(query, offset, 1)}}" hidden$="[[_hideNextArrow(changes.length)]]">Next &rarr;</a>
     </nav>
   </template>
   <script>
@@ -109,18 +122,18 @@
     'use strict';
 
     var BASE_URL = 'https://gerrit-review.googlesource.com/';
+    var DEFAULT_NUM_CHANGES = 25;
 
     Polymer({
       is: 'gr-change-list',
 
       properties: {
         /**
-         * The query string used to refine the list.
+         * URL params passed from the router.
          */
-        query: {
-          type: String,
-          value: 'status:open',
-          notify: true
+        params: {
+          type: Object,
+          observer: '_paramsChanged',
         },
 
         /**
@@ -139,16 +152,13 @@
         selectedIndex: {
           type: Number,
           value: 0,
-          observer: '_selectedIndexChanged'
+          observer: '_selectedIndexChanged',
         },
+      },
 
-        /**
-         * The offset of results to return from the API.
-         */
-        offset: {
-          type: Number,
-          value: 0,
-        }
+      _paramsChanged: function(value) {
+        this.query = value.query;
+        this.offset = value.offset || 0;
       },
 
       _selectedIndexChanged: function(value) {
@@ -169,7 +179,7 @@
 
       _computeQueryParams: function(query, offset) {
         var obj = {
-          n: 25,  // Number of results to return.
+          n: DEFAULT_NUM_CHANGES,  // Number of results to return.
           O: 81,  // Include owner information.
           S: offset || 0,
         };
@@ -180,13 +190,24 @@
       },
 
       _computeNavLink: function(query, offset, direction) {
-        if (!query) { return '#/'; }
-
         // Offset could be a string when passed from the router.
         offset = +(offset || 0);
-        console.log(direction, query, offset)
         var newOffset = Math.max(0, offset + (25 * direction));
-        return '/q/' + query + ',' + newOffset;
+        var href = '/q/' + query;
+        if (newOffset > 0) {
+          href += ',' + newOffset;
+        }
+        return href;
+      },
+
+      _hidePrevArrow: function(offset) {
+        console.log('hide prev arrow', offset)
+        return offset == 0;
+      },
+
+      _hideNextArrow: function(changesLen) {
+        console.log('changeslen', changesLen)
+        return changesLen < DEFAULT_NUM_CHANGES;
       },
 
       _handleResponse: function(e, req) {
@@ -233,7 +254,6 @@
       },
 
     });
-
   })();
   </script>
 </dom-module>
