@@ -45,6 +45,9 @@
         vertical-align: -4px;
         width: 16px;
       }
+      .u-monospace {
+        font-family: 'Source Code Pro';
+      }
       .u-green {
         color: #388E3C;
       }
@@ -110,7 +113,7 @@
             <a href$="[[_projectBranchURL(change.project, change.branch)]]">[[change.branch]]</a>
           </td>
           <td><gr-date-formatter date-str="[[change.updated]]"></gr-date-formatter></td>
-          <td class="changeSize">
+          <td class="u-monospace">
             <span class="u-green"><span>+</span>[[change.insertions]]</span>,
             <span class="u-red"><span>-</span>[[change.deletions]]</span>
           </td>
@@ -199,10 +202,15 @@
 
       _computeCodeReviewClass: function(codeReview) {
         if (!codeReview) { return ''; }
-        if (codeReview.approved || codeReview.value == 1) {
+        if (codeReview.approved) {
           return 'u-green';
         }
-        return 'u-red';
+        if (codeReview.value == 1) {
+          return 'u-monospace u-green';
+        }
+        if (codeReview.value == -1) {
+          return 'u-monospace u-red';
+        }
       },
 
       _computeCodeReviewLabel: function(codeReview) {
@@ -266,7 +274,7 @@
       },
 
       _changeURL: function(change) {
-        return '/c/' + change._number;
+        return '/c/' + change._number + '/';
       },
 
       _ownerLink: function(owner) {
