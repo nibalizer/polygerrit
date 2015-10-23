@@ -7,7 +7,7 @@ window.addEventListener('WebComponentsReady', function() {
     next();
   }
 
-  // Routes
+  // Routes.
   page('/', function() {
     page.redirect('/q/status:open');
   });
@@ -20,14 +20,17 @@ window.addEventListener('WebComponentsReady', function() {
   page('/q/:query,:offset', scrollToTop, queryHandler);
   page('/q/:query', scrollToTop, queryHandler);
 
-  page('/c', scrollToTop, function(data) {
+  page('/c/:changeID', scrollToTop, function(data) {
+    app.route = 'gr-change-view';
+    app.params = data.params;
+  });
+
+  page('/c/:changeID/:patchSetNum', scrollToTop, function(data) {
     app.route = 'gr-diff';
     app.params = data.params;
   });
 
-  page({
-    hashbang: true
-  });
-
+  // Start.
+  page();
 });
 </script>

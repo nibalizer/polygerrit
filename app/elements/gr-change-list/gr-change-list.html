@@ -63,7 +63,7 @@
     <iron-ajax
         auto
         url="/changes/"
-        params="{{_computeQueryParams(query, offset)}}"
+        params="[[_computeQueryParams(query, offset)]]"
         handle-as="text"
         on-response="_handleResponse"
         debounce-duration="300"></iron-ajax>
@@ -224,14 +224,13 @@
             this.selectedIndex -= 1;
             break;
           case 'enter':
-            window.location.href =
-                this._changeURL(this.changes[this.selectedIndex]);
+            page(this._changeURL(this.changes[this.selectedIndex]));
             break;
         }
       },
 
       _changeURL: function(change) {
-        return BASE_URL + change._number;
+        return '/c/' + change._number;
       },
 
       _ownerLink: function(owner) {

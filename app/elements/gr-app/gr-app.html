@@ -40,6 +40,9 @@
     <template is="dom-if" if="{{_showChangeList}}">
       <gr-change-list params="[[params]]" role="main"></gr-change-list>
     </template>
+    <template is="dom-if" if="{{_showChangeView}}">
+      <gr-change-view params="[[params]]" role="main"></gr-change-view>
+    </template>
     <template is="dom-if" if="{{_showDiffView}}">
       <gr-diff role="main"></gr-diff>
     </template>
@@ -63,6 +66,7 @@
 
       _routeChanged: function(route) {
         this.set('_showChangeList', route == 'gr-change-list');
+        this.set('_showChangeView', route == 'gr-change-view');
         this.set('_showDiffView', route == 'gr-diff');
       },
     });
