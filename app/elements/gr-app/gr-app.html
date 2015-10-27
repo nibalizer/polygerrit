@@ -27,9 +27,6 @@
       gr-search-bar {
         width: 500px;
       }
-      gr-change-list {
-        margin: 0 20px;
-      }
     </style>
     <header role="banner">
       <a href="/" class="bigTitle">PolyGerrit</a>
@@ -38,7 +35,7 @@
       </div>
     </header>
     <template is="dom-if" if="{{_showChangeList}}">
-      <gr-change-list params="[[params]]" role="main"></gr-change-list>
+      <gr-change-list-view params="[[params]]" role="main"></gr-change-list-view>
     </template>
     <template is="dom-if" if="{{_showChangeView}}">
       <gr-change-view params="[[params]]" role="main"></gr-change-view>
