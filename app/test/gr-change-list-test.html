@@ -5,6 +5,8 @@
 <script src="../../bower_components/webcomponentsjs/webcomponents.min.js"></script>
 <script src="../../bower_components/web-component-tester/browser.js"></script>
 <script src="../../bower_components/test-fixture/test-fixture-mocha.js"></script>
+<script src="../../bower-components/iron-test-helpers/mock-interactions.js"></script>
+
 <link rel="import" href="../../bower_components/test-fixture/test-fixture.html">
 <link rel="import" href="../elements/gr-change-list/gr-change-list.html">
 
@@ -22,8 +24,8 @@
       changeList = fixture('basic');
     });
 
-    test('', function() {
-
+    test('keyboard shortcuts', function() {
+      changeList.focus();
     });
 
   });

@@ -60,16 +60,16 @@
       <td>
         <a href$="[[changeURL()]]">[[change.subject]]</a>
       </td>
-      <td>[[change.status]]</td>
+      <td>[[_computeChangeStatusString(change)]]</td>
       <td>
         <img class="avatarImage" src$="[[change.owner.avatars.0.url]]">
-        <a href$="[[_computeOwnerLink()]]" title$="[[_computeOwnerTitle()]]">[[change.owner.name]]</a>
+        <a href$="[[_computeOwnerLink(change.owner.email)]]" title$="[[_computeOwnerTitle(change.owner)]]">[[change.owner.name]]</a>
       </td>
       <td>
-        <a href$="[[_computeProjectURL()]]">[[change.project]]</a>
+        <a href$="[[_computeProjectURL(change.project)]]">[[change.project]]</a>
       </td>
       <td>
-        <a href$="[[_computeProjectBranchURL()]]">[[change.branch]]</a>
+        <a href$="[[_computeProjectBranchURL(change.project, change.branch)]]">[[change.branch]]</a>
       </td>
       <td><gr-date-formatter date-str="[[change.updated]]"></gr-date-formatter></td>
       <td class="u-monospace">
@@ -99,13 +99,20 @@
         selected: {
           type: Boolean,
           reflectToAttribute: true,
-          value: false,
         },
         change: Object,
       },
 
       changeURL: function() {
+        if (!this.change) { return ''; }
         return '/c/' + this.change._number + '/';
+      },
+
+      _computeChangeStatusString: function(change) {
+        if (!change.mergeable) {
+          return 'Merge Conflict';
+        }
+        return '';
       },
 
       _computeCodeReviewClass: function(codeReview) {
@@ -119,6 +126,7 @@
         if (codeReview.value == -1) {
           return 'u-monospace u-red';
         }
+        return '';
       },
 
       _computeCodeReviewLabel: function(codeReview) {
@@ -132,30 +140,31 @@
         if (codeReview.value == -1) {
           return '-1';
         }
+        return '';
       },
 
       _computeVerifiedLabel: function(verified) {
-        if (!verified) { return ''; }
-        if (verified.approved) {
+        if (verified && verified.approved) {
           return '✓';
         }
+        return ''
       },
 
-      _computeOwnerLink: function() {
-        return '/q/owner:' + encodeURIComponent(this.change.owner.email) + '+status:open';
+      _computeOwnerLink: function(email) {
+        return '/q/owner:' + encodeURIComponent(email) + '+status:open';
       },
 
-      _computeOwnerTitle: function() {
+      _computeOwnerTitle: function(owner) {
         // TODO: Is this safe from XSS attacks?
-        return this.change.owner.name + ' <' + this.change.owner.email + '>';
+        return owner.name + ' <' + owner.email + '>';
       },
 
-      _computeProjectURL: function() {
-        return BASE_URL + '#/projects/' + this.change.project + ',dashboards/default';
+      _computeProjectURL: function(project) {
+        return BASE_URL + '#/projects/' + project + ',dashboards/default';
       },
 
-      _computeProjectBranchURL: function() {
-        return '/q/status:open+project:' + this.change.project + '+branch:' + this.change.branch;
+      _computeProjectBranchURL: function(project, branch) {
+        return '/q/status:open+project:' + project + '+branch:' + branch;
       },
 
     });
