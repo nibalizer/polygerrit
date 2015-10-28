@@ -5,8 +5,8 @@
 <script src="../../bower_components/webcomponentsjs/webcomponents.min.js"></script>
 <script src="../../bower_components/web-component-tester/browser.js"></script>
 <script src="../../bower_components/test-fixture/test-fixture-mocha.js"></script>
-<script src="../../bower-components/iron-test-helpers/mock-interactions.js"></script>
 
+<link rel="import" href="../../bower_components/iron-test-helpers/iron-test-helpers.html">
 <link rel="import" href="../../bower_components/test-fixture/test-fixture.html">
 <link rel="import" href="../elements/gr-change-list/gr-change-list.html">
 
@@ -25,7 +25,41 @@
     });
 
     test('keyboard shortcuts', function() {
-      changeList.focus();
+      changeList.changes = [
+        {_number: 0},
+        {_number: 1},
+        {_number: 2},
+      ];
+      flushAsynchronousOperations();
+      var changeListItems =
+          changeList.querySelectorAll('gr-change-list-item:not([header])');
+      assert.equal(changeListItems.length, 3);
+      assert.equal(changeList.selectedIndex, 0);
+
+      // TODO(andybons): Without this, toggleAttribute is undefined on the DOM
+      // node when running the test. o_O
+      var oldSelectedIndexChangedFn = changeList._selectedIndexChanged;
+      changeList._selectedIndexChanged = function() {};
+      var jEvent = { detail: { combo: 'j' }};
+      var kEvent = { detail: { combo: 'k' }};
+      changeList._handleKey(jEvent);
+      flushAsynchronousOperations();
+      assert.equal(changeList.selectedIndex, 1);
+      changeList._handleKey(jEvent);
+      flushAsynchronousOperations();
+      assert.equal(changeList.selectedIndex, 2);
+      changeList._handleKey(kEvent);
+      flushAsynchronousOperations();
+      assert.equal(changeList.selectedIndex, 1);
+      changeList._handleKey(kEvent);
+      flushAsynchronousOperations();
+      changeList._handleKey(kEvent);
+      flushAsynchronousOperations();
+      changeList._handleKey(kEvent);
+      flushAsynchronousOperations();
+      assert.equal(changeList.selectedIndex, 0);
+
+      changeList._selectedIndexChanged = oldSelectedIndexChangedFn;
     });
 
   });

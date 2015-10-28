@@ -151,10 +151,12 @@
       },
 
       _computeOwnerLink: function(email) {
+        if (!email) { return ''; }
         return '/q/owner:' + encodeURIComponent(email) + '+status:open';
       },
 
       _computeOwnerTitle: function(owner) {
+        if (!owner) { return ''; }
         // TODO: Is this safe from XSS attacks?
         return owner.name + ' <' + owner.email + '>';
       },
