@@ -1,0 +1,97 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="gr-file-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      table a {
+        display: table-cell;
+      }
+      td {
+        padding: 2px 0;
+      }
+      th {
+        text-align: left;
+      }
+      .status {
+        min-width: 20px;
+      }
+    </style>
+    <iron-ajax id="xhr"
+        url="[[_computeFilesURL(changeNum, revision)]]"
+        handle-as="text"
+        on-response="_handleResponse"
+        debounce-duration="300"></iron-ajax>
+    <table>
+      <tr>
+        <th></th>
+        <th></th>
+        <th>Path</th>
+        <th>Stats</th>
+      </tr>
+      <template is="dom-repeat" items="{{files}}" as="file">
+        <tr>
+          <td></td>
+          <td class="status">[[file.status]]</td>
+          <td class="path">
+            <a class="file" href$="[[_computeDiffURL(changeNum, patchNum, file.__path)]]">[[file.__path]]</a>
+          </td>
+          <td></td>
+        </tr>
+      </template>
+    </table>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'gr-file-list',
+
+      properties: {
+        patchNum: Number,
+        changeNum: {
+          type: Number,
+          observer: '_changeNumOrRevisionChanged',
+        },
+        revision: {
+          type: String,
+          observer: '_changeNumOrRevisionChanged',
+        },
+      },
+
+      _changeNumOrRevisionChanged: function() {
+        if (!!this.changeNum && !!this.revision) {
+          this.$.xhr.generateRequest();
+        }
+      },
+
+      _computeFilesURL: function(changeNum, revision) {
+        return '/changes/' + changeNum + '/revisions/' + revision + '/files';
+      },
+
+      _handleResponse: function(e, req) {
+        var result = JSON.parse(req.response.substring(')]}\''.length));
+        var paths = Object.keys(result).sort();
+        var files = [];
+        for (var i = 0; i < paths.length; i++) {
+          var info = result[paths[i]];
+          info.__path = paths[i];
+          files.push(info)
+        }
+        this.files = files;
+      },
+
+      _computeDiffURL: function(changeNum, patchNum, path) {
+        return '/c/' + changeNum + '/' + patchNum + '/' + path;
+      },
+    });
+  })();
+  </script>
+</dom-module>

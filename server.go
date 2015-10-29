@@ -35,11 +35,12 @@ func main() {
 
 func handleChanges(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	u, err := url.Parse("https://gerrit-review.googlesource.com/changes/")
+	u, err := url.Parse("https://gerrit-review.googlesource.com")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	u.Path = r.URL.Path
 	u.RawQuery = r.URL.RawQuery
 	res, err := http.Get(u.String())
 	if err != nil {

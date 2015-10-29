@@ -3,6 +3,11 @@
 <dom-module id="gr-app">
   <template>
     <style>
+      :host {
+        display: flex;
+        min-height: 100vh;
+        flex-direction: column;
+      }
       header,
       footer {
         padding: 20px;
@@ -10,6 +15,9 @@
       header {
         display: flex;
         align-items: center;
+      }
+      main {
+        flex: 1;
       }
       .bigTitle {
         color: #000;
@@ -34,15 +42,17 @@
         <gr-search-bar value="[[params.query]]" role="search"></gr-search-bar>
       </div>
     </header>
-    <template is="dom-if" if="{{_showChangeList}}">
-      <gr-change-list-view params="[[params]]" role="main"></gr-change-list-view>
-    </template>
-    <template is="dom-if" if="{{_showChangeView}}">
-      <gr-change-view params="[[params]]" role="main"></gr-change-view>
-    </template>
-    <template is="dom-if" if="{{_showDiffView}}">
-      <gr-diff role="main"></gr-diff>
-    </template>
+    <main>
+      <template is="dom-if" if="{{_showChangeList}}">
+        <gr-change-list-view params="[[params]]"></gr-change-list-view>
+      </template>
+      <template is="dom-if" if="{{_showChangeView}}">
+        <gr-change-view params="[[params]]"></gr-change-view>
+      </template>
+      <template is="dom-if" if="{{_showDiffView}}">
+        <gr-diff></gr-diff>
+      </template>
+    </main>
     <footer role="contentinfo">Powered by PolyGerrit</footer>
   </template>
   <script>

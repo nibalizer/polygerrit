@@ -63,9 +63,13 @@
       },
 
       _computeQueryParams: function(query, offset) {
+        var options = Changes.listChangesOptionsToHex(
+            Changes.ListChangesOption.LABELS,
+            Changes.ListChangesOption.DETAILED_ACCOUNTS
+        );
         var obj = {
           n: DEFAULT_NUM_CHANGES,  // Number of results to return.
-          O: 81,  // Include owner information.
+          O: options,
           S: offset || 0,
         };
         if (query && query.length > 0) {
