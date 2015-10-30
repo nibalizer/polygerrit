@@ -38,6 +38,11 @@
     Polymer({
       is: 'gr-search-bar',
 
+      listeners: {
+        'searchButton.tap': '_searchButtonTapHandler',
+        'value-changed': '_valueChangedHandler',
+      },
+
       properties: {
         value: {
           type: String,
@@ -46,17 +51,15 @@
         }
       },
 
-      ready: function() {
-        var self = this;
-        this.addEventListener('value-changed', function(e) {
-          self.inputVal = e.detail.value;
-        });
+      _valueChangedHandler: function(e) {
+        this.inputVal = e.detail.value;
+      },
 
-        this.$.searchButton.addEventListener('click', function(e) {
-          e.preventDefault();
-          page.show('/q/' + self.inputVal);
-        });
-      }
+      _searchButtonTapHandler: function(e) {
+        e.preventDefault();
+        page.show('/q/' + this.inputVal);
+      },
+
     });
 
   })();

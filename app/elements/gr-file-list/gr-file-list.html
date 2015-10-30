@@ -6,6 +6,9 @@
       :host {
         display: block;
       }
+      .tableContainer {
+        overflow-x: auto;
+      }
       table {
         border-collapse: collapse;
         width: 100%;
@@ -15,6 +18,7 @@
       }
       td {
         padding: 2px 0;
+        white-space: nowrap;
       }
       th {
         text-align: left;
@@ -28,28 +32,30 @@
         handle-as="text"
         on-response="_handleResponse"
         debounce-duration="300"></iron-ajax>
-    <table>
-      <tr>
-        <th></th>
-        <th></th>
-        <th>Path</th>
-        <th>Stats</th>
-      </tr>
-      <template is="dom-repeat" items="{{files}}" as="file">
+    <div class="tableContainer">
+      <table>
         <tr>
-          <td></td>
-          <td class="status">[[file.status]]</td>
-          <td class="path">
-            <a class="file"
-               href$="[[_computeDiffURL(changeNum, patchNum, file.__path)]]">[[file.__path]]</a>
-          </td>
-          <td>
-            +<span>[[file.lines_inserted]]</span> lines,
-            -<span>[[file.lines_deleted]]</span> lines
-          </td>
+          <th></th>
+          <th></th>
+          <th>Path</th>
+          <th>Stats</th>
         </tr>
-      </template>
-    </table>
+        <template is="dom-repeat" items="{{files}}" as="file">
+          <tr>
+            <td></td>
+            <td class="status">[[file.status]]</td>
+            <td class="path">
+              <a class="file"
+                 href$="[[_computeDiffURL(changeNum, patchNum, file.__path)]]">[[file.__path]]</a>
+            </td>
+            <td>
+              +<span>[[file.lines_inserted]]</span> lines,
+              -<span>[[file.lines_deleted]]</span> lines
+            </td>
+          </tr>
+        </template>
+      </table>
+    </div>
   </template>
   <script>
   (function() {
