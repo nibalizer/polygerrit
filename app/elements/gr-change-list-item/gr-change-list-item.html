@@ -27,8 +27,9 @@
         visibility: hidden;
       }
       .avatarImage {
+        border-radius: 50%;
         height: 16px;
-        vertical-align: -4px;
+        vertical-align: -3px;
         width: 16px;
       }
       .u-monospace {
@@ -62,7 +63,7 @@
       </td>
       <td>[[_computeChangeStatusString(change)]]</td>
       <td>
-        <img class="avatarImage" src$="[[change.owner.avatars.0.url]]">
+        <img class="avatarImage" src$="[[_computeAvatarURL(change.owner)]]">
         <a href$="[[_computeOwnerLink(change.owner.email)]]" title$="[[_computeOwnerTitle(change.owner)]]">[[change.owner.name]]</a>
       </td>
       <td>
@@ -148,6 +149,11 @@
           return '✓';
         }
         return ''
+      },
+
+      _computeAvatarURL: function(owner) {
+        if (!owner) { return ''; }
+        return '/accounts/' + owner.email + '/avatar?s=32'
       },
 
       _computeOwnerLink: function(email) {

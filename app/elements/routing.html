@@ -25,12 +25,16 @@ window.addEventListener('WebComponentsReady', function() {
     app.params = data.params;
   });
 
-  page('/c/:changeNum/:patchSetNum', scrollToTop, function(data) {
+  page(/^\/c\/(\d+)\/(\d+)\/(.+)/, scrollToTop, function(ctx) {
     app.route = 'gr-diff';
-    app.params = data.params;
+    var params = {
+      changeNum: ctx.params[0],
+      patchNum: ctx.params[1],
+      path: ctx.params[2]
+    };
+    app.params = params;
   });
 
-  // Start.
-  page();
+  page.start();
 });
 </script>

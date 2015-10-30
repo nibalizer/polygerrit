@@ -1,0 +1,95 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="gr-message">
+  <template>
+    <style>
+      :host {
+        border-top: 1px solid #ddd;
+        display: block;
+        position: relative;
+      }
+      :host:not([expanded]) {
+        cursor: pointer;
+      }
+      :host[expanded] .name {
+        cursor: pointer;
+      }
+      .avatar {
+        border-radius: 50%;
+      }
+      .contentContainer {
+        margin-left: 45px;
+        padding: 7px 0 10px;
+      }
+      .avatar {
+        height: 30px;
+        position: absolute;
+        top: 10px;
+        left: 0;
+        width: 30px;
+      }
+      .content {
+        white-space: pre-wrap;
+      }
+      .collapsed .content {
+        color: #666;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .name {
+        font-weight: bold;
+      }
+    </style>
+    <div class$="[[_computeClass(expanded)]]">
+      <img class="avatar" src$="[[_computeAvatarURL(message.author)]]">
+      <div class="contentContainer">
+        <div class="name" id="name">[[message.author.name]]</div>
+        <div class="content">[[message.message]]</div>
+      </div>
+    </div>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'gr-message',
+
+      listeners: {
+        'tap': '_tapHandler',
+        'name.tap': '_collapseHandler',
+      },
+
+      properties: {
+        message: Object,
+        expanded: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+        },
+      },
+
+      _tapHandler: function(e) {
+        if (this.expanded) { return; }
+        this.expanded = true;
+      },
+
+      _collapseHandler: function(e) {
+        if (!this.expanded) { return; }
+        e.stopPropagation();
+        this.expanded = false;
+      },
+
+      _computeClass: function(expanded) {
+        return expanded ? 'expanded' : 'collapsed';
+      },
+
+      _computeAvatarURL: function(author) {
+        return '/accounts/' + author.email + '/avatar?s=100';
+      },
+
+    });
+  })();
+  </script>
+</dom-module>

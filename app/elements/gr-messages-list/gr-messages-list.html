@@ -1,0 +1,34 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="gr-messages-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      h3 {
+        margin: 20px 0 5px;
+      }
+    </style>
+    <h3>Messages</h3>
+    <template is="dom-repeat" items="{{messages}}" as="message">
+      <gr-message message="[[message]]"></gr-message>
+    </template>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'gr-messages-list',
+
+      properties: {
+        messages: {
+          type: Array,
+          value: [],
+        },
+      },
+    });
+  })();
+  </script>
+</dom-module>

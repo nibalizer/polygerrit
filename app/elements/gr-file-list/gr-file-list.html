@@ -20,7 +20,7 @@
         text-align: left;
       }
       .status {
-        min-width: 20px;
+        width: 20px;
       }
     </style>
     <iron-ajax id="xhr"
@@ -40,9 +40,13 @@
           <td></td>
           <td class="status">[[file.status]]</td>
           <td class="path">
-            <a class="file" href$="[[_computeDiffURL(changeNum, patchNum, file.__path)]]">[[file.__path]]</a>
+            <a class="file"
+               href$="[[_computeDiffURL(changeNum, patchNum, file.__path)]]">[[file.__path]]</a>
           </td>
-          <td></td>
+          <td>
+            +<span>[[file.lines_inserted]]</span> lines,
+            -<span>[[file.lines_deleted]]</span> lines
+          </td>
         </tr>
       </template>
     </table>
@@ -83,6 +87,8 @@
         for (var i = 0; i < paths.length; i++) {
           var info = result[paths[i]];
           info.__path = paths[i];
+          info.lines_inserted = info.lines_inserted || 0;
+          info.lines_deleted = info.lines_deleted || 0;
           files.push(info)
         }
         this.files = files;

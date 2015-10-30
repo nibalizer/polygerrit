@@ -28,12 +28,13 @@ func main() {
 		http.Handle("/", http.FileServer(http.Dir("app")))
 	}
 
-	http.HandleFunc("/changes/", handleChanges)
+	http.HandleFunc("/changes/", handleRESTProxy)
+	http.HandleFunc("/accounts/", handleRESTProxy)
 	log.Println("Serving on port", *port)
 	log.Fatal(http.ListenAndServe(*port, &server{}))
 }
 
-func handleChanges(w http.ResponseWriter, r *http.Request) {
+func handleRESTProxy(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	u, err := url.Parse("https://gerrit-review.googlesource.com")
 	if err != nil {

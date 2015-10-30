@@ -92,7 +92,6 @@
       _changeURLForIndex: function(index) {
         var changeEls = this.querySelectorAll('gr-change-list-item:not([header])');
         if (index < changeEls.length && changeEls[index]) {
-          console.log(changeEls[index].changeURL())
           return changeEls[index].changeURL();
         }
         return '';

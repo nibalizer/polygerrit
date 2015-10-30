@@ -9,7 +9,8 @@
       .container {
         margin: 0 20px;
       }
-      .changeInfo {
+      .changeInfo,
+      .summary {
         margin: 10px 0;
         padding: 10px 0;
       }
@@ -25,12 +26,14 @@
         text-align: right;
       }
       .summary {
-        border-top: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
         font-family: 'Source Code Pro', Menlo, 'Lucida Console', Monaco, monospace;
         margin: 10px 0;
         padding: 10px 0;
         white-space: pre;
+      }
+      .summary {
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
       }
     </style>
     <iron-ajax id="detailXHR"
@@ -84,6 +87,7 @@
       <gr-file-list change-num="[[changeNum]]"
                     patch-num="[[_computePatchNum(change.current_revision)]]"
                     revision="[[change.current_revision]]"></gr-file-list>
+      <gr-messages-list messages="[[change.messages]]"></gr-messages-list>
     </div>
   </template>
   <script>
@@ -123,7 +127,7 @@
       },
 
       _computePatchNum: function(revision) {
-        return this.change.revisions[revision]._number;
+        return this.change && this.change.revisions[revision]._number;
       },
 
       _computeChangeDetailQueryParams: function() {
@@ -137,14 +141,16 @@
 
       _handleChangeDetailResponse: function(e, req) {
         this.change = JSON.parse(req.response.substring(')]}\''.length));
+        console.log(this.change.messages)
       },
 
       _computeCurrentRevisionMessage: function(change) {
-        if (!change) { return ''; }
-        return change.revisions[change.current_revision].commit.message;
+        return change &&
+            change.revisions[change.current_revision].commit.message;
       },
 
       _computeReviewers: function(reviewers, owner) {
+        if (reviewers.length == 1) { return reviewers; }
         return reviewers.filter(function(reviewer) {
           return reviewer._account_id != owner._account_id;
         });
