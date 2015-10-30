@@ -118,6 +118,7 @@
       },
 
       _computeAvatarURL: function(author) {
+        if (!author) { return '' }
         return '/accounts/' + author.email + '/avatar?s=100';
       },
 

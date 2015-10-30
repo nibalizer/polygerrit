@@ -46,10 +46,10 @@
       <template is="dom-if" if="{{_showChangeList}}">
         <gr-change-list-view params="[[params]]"></gr-change-list-view>
       </template>
-      <template is="dom-if" if="{{_showChangeView}}">
+      <template is="dom-if" if="{{_showChangeView}}" restamp="true">
         <gr-change-view params="[[params]]"></gr-change-view>
       </template>
-      <template is="dom-if" if="{{_showDiffView}}">
+      <template is="dom-if" if="{{_showDiffView}}" restamp="true">
         <gr-diff></gr-diff>
       </template>
     </main>
