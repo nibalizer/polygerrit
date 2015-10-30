@@ -68,6 +68,10 @@
           type: String,
           observer: '_changeNumOrRevisionChanged',
         },
+        comments: {
+          type: Array,
+          value: [],
+        },
       },
 
       _changeNumOrRevisionChanged: function() {

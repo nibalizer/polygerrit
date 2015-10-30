@@ -37,10 +37,15 @@
       }
     </style>
     <iron-ajax id="detailXHR"
-        url="[[_computeChangeDetailPath(changeNum)]]"
-        params="[[_computeChangeDetailQueryParams()]]"
+        url="[[_computeDetailPath(changeNum)]]"
+        params="[[_computeDetailQueryParams()]]"
         handle-as="text"
-        on-response="_handleChangeDetailResponse"
+        on-response="_handleDetailResponse"
+        debounce-duration="300"></iron-ajax>
+    <iron-ajax id="commentsXHR"
+        url="[[_computeCommentsPath(changeNum)]]"
+        handle-as="text"
+        on-response="_handleCommentsResponse"
         debounce-duration="300"></iron-ajax>
 
     <div class="container">
@@ -86,7 +91,8 @@
       <div class="summary">[[_computeCurrentRevisionMessage(change)]]</div>
       <gr-file-list change-num="[[changeNum]]"
                     patch-num="[[_computePatchNum(change.current_revision)]]"
-                    revision="[[change.current_revision]]"></gr-file-list>
+                    revision="[[change.current_revision]]"
+                    comments="[[comments]]"></gr-file-list>
       <gr-messages-list messages="[[change.messages]]"></gr-messages-list>
     </div>
   </template>
@@ -113,12 +119,14 @@
         this.changeNum = value.changeNum;
         if (!this.changeNum) {
           this.change = null;
+          this.comments = null;
           return;
         }
         this.$.detailXHR.generateRequest();
+        this.$.commentsXHR.generateRequest();
       },
 
-      _computeChangeDetailPath: function(changeNum) {
+      _computeDetailPath: function(changeNum) {
         return '/changes/' + changeNum + '/detail';
       },
 
@@ -126,11 +134,15 @@
         return '/changes/' + changeNum + '/revisions/' + commitHash + '/commit';
       },
 
+      _computeCommentsPath: function(changeNum) {
+        return '/changes/' + changeNum + '/comments';
+      },
+
       _computePatchNum: function(revision) {
         return this.change && this.change.revisions[revision]._number;
       },
 
-      _computeChangeDetailQueryParams: function() {
+      _computeDetailQueryParams: function() {
         var options = Changes.listChangesOptionsToHex(
             Changes.ListChangesOption.CURRENT_REVISION,
             Changes.ListChangesOption.CURRENT_COMMIT,
@@ -139,9 +151,12 @@
         return { O: options };
       },
 
-      _handleChangeDetailResponse: function(e, req) {
+      _handleDetailResponse: function(e, req) {
         this.change = JSON.parse(req.response.substring(')]}\''.length));
-        console.log(this.change.messages)
+      },
+
+      _handleCommentsResponse: function(e, req) {
+        this.comments = JSON.parse(req.response.substring(')]}\''.length));
       },
 
       _computeCurrentRevisionMessage: function(change) {
