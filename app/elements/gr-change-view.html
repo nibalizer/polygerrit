@@ -1,4 +1,8 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="./gr-date-formatter.html">
+<link rel="import" href="./gr-file-list.html">
+<link rel="import" href="./gr-messages-list.html">
 
 <dom-module id="gr-change-view">
   <template>
@@ -94,7 +98,7 @@
                     patch-num="[[_computePatchNum(change.current_revision)]]"
                     revision="[[change.current_revision]]"
                     comments="[[comments]]"></gr-file-list>
-      <gr-messages-list messages="[[change.messages]]"></gr-messages-list>
+      <gr-messages-list messages="[[change.messages]]" comments="[[comments]]"></gr-messages-list>
     </div>
   </template>
   <script>

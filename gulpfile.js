@@ -50,7 +50,7 @@ var optimizeHtmlTask = function (src, dest) {
 
   return gulp.src(src)
     // Replace path for vulcanized assets
-    .pipe($.if('*.html', $.replace('elements/elements.html', 'elements/elements.vulcanized.html')))
+    .pipe($.if('*.html', $.replace('elements/gr-app.html', 'elements/gr-app.vulcanized.html')))
     .pipe(assets)
     // Concatenate and minify JavaScript
     .pipe($.if('*.js', $.uglify({preserveComments: 'some'})))
@@ -102,8 +102,8 @@ gulp.task('copy', function () {
                            'app/elements/**/*.js'])
     .pipe(gulp.dest('dist/elements'));
 
-  var vulcanized = gulp.src(['app/elements/elements.html'])
-    .pipe($.rename('elements.vulcanized.html'))
+  var vulcanized = gulp.src(['app/elements/gr-app.html'])
+    .pipe($.rename('gr-app.vulcanized.html'))
     .pipe(gulp.dest('dist/elements'));
 
   return merge(app, bower, elements, vulcanized)
@@ -127,7 +127,7 @@ gulp.task('html', function () {
 // Vulcanize granular configuration.
 gulp.task('vulcanize', function () {
   var DEST_DIR = 'dist/elements';
-  return gulp.src('dist/elements/elements.vulcanized.html')
+  return gulp.src('dist/elements/gr-app.vulcanized.html')
     .pipe($.vulcanize({
       stripComments: true,
       inlineCss: true,
@@ -142,62 +142,6 @@ gulp.task('clean', function (cb) {
   del(['.tmp', 'dist'], cb);
 });
 
-// Watch files for changes & reload
-gulp.task('serve', ['styles', 'elements', 'images'], function () {
-  browserSync({
-    port: 5000,
-    notify: false,
-    logPrefix: 'PSK',
-    snippetOptions: {
-      rule: {
-        match: '<span id="browser-sync-binding"></span>',
-        fn: function (snippet) {
-          return snippet;
-        }
-      }
-    },
-    // Run as an https by uncommenting 'https: true'
-    // Note: this uses an unsigned certificate which on first access
-    //       will present a certificate warning in the browser.
-    // https: true,
-    server: {
-      baseDir: ['.tmp', 'app'],
-      middleware: [ historyApiFallback() ],
-      routes: {
-        '/bower_components': 'bower_components'
-      }
-    }
-  });
-
-  gulp.watch(['app/**/*.html'], reload);
-  gulp.watch(['app/styles/**/*.css'], ['styles', reload]);
-  gulp.watch(['app/elements/**/*.css'], ['elements', reload]);
-  // gulp.watch(['app/{scripts,elements}/**/{*.js,*.html}'], ['jshint']);
-  gulp.watch(['app/images/**/*'], reload);
-});
-
-// Build and serve the output from the dist build
-gulp.task('serve:dist', ['default'], function () {
-  browserSync({
-    port: 5001,
-    notify: false,
-    logPrefix: 'PSK',
-    snippetOptions: {
-      rule: {
-        match: '<span id="browser-sync-binding"></span>',
-        fn: function (snippet) {
-          return snippet;
-        }
-      }
-    },
-    // Run as an https by uncommenting 'https: true'
-    // Note: this uses an unsigned certificate which on first access
-    //       will present a certificate warning in the browser.
-    // https: true,
-    server: 'dist',
-    middleware: [ historyApiFallback() ]
-  });
-});
 
 // Build production files, the default task
 gulp.task('default', ['clean'], function (cb) {

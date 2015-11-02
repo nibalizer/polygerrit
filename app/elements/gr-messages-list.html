@@ -1,4 +1,5 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="./gr-message.html">
 
 <dom-module id="gr-messages-list">
   <template>
@@ -24,6 +25,10 @@
 
       properties: {
         messages: {
+          type: Array,
+          value: [],
+        },
+        comments: {
           type: Array,
           value: [],
         },

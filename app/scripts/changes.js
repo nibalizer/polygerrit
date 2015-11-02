@@ -57,4 +57,3 @@ Changes.listChangesOptionsToHex = function() {
   }
   return v.toString(16);
 };
-
