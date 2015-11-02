@@ -36,30 +36,22 @@
       assert.equal(changeListItems.length, 3);
       assert.equal(changeList.selectedIndex, 0);
 
-      // TODO(andybons): Without this, toggleAttribute is undefined on the DOM
-      // node when running the test. o_O
-      var oldSelectedIndexChangedFn = changeList._selectedIndexChanged;
-      changeList._selectedIndexChanged = function() {};
-      var jEvent = { detail: { combo: 'j' }};
-      var kEvent = { detail: { combo: 'k' }};
-      changeList._handleKey(jEvent);
+      MockInteractions.pressAndReleaseKeyOn(changeList, 74);  // 'j'
       flushAsynchronousOperations();
       assert.equal(changeList.selectedIndex, 1);
-      changeList._handleKey(jEvent);
+      MockInteractions.pressAndReleaseKeyOn(changeList, 74);  // 'j'
       flushAsynchronousOperations();
       assert.equal(changeList.selectedIndex, 2);
-      changeList._handleKey(kEvent);
+      MockInteractions.pressAndReleaseKeyOn(changeList, 75);  // 'k'
       flushAsynchronousOperations();
       assert.equal(changeList.selectedIndex, 1);
-      changeList._handleKey(kEvent);
+      MockInteractions.pressAndReleaseKeyOn(changeList, 75);  // 'k'
       flushAsynchronousOperations();
-      changeList._handleKey(kEvent);
+      MockInteractions.pressAndReleaseKeyOn(changeList, 75);  // 'k'
       flushAsynchronousOperations();
-      changeList._handleKey(kEvent);
+      MockInteractions.pressAndReleaseKeyOn(changeList, 75);  // 'k'
       flushAsynchronousOperations();
       assert.equal(changeList.selectedIndex, 0);
-
-      changeList._selectedIndexChanged = oldSelectedIndexChangedFn;
     });
 
   });
