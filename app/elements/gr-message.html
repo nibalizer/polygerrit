@@ -57,6 +57,9 @@
       .collapsed .content {
         display: inline;
       }
+      .collapsed .comments {
+        display: none;
+      }
       .collapsed .name,
       .collapsed gr-date-formatter {
         color: #000;
@@ -64,7 +67,8 @@
       .expanded .name {
         cursor: pointer;
       }
-      .expanded .content {
+      .expanded .message,
+      .expanded .commentMessage {
         white-space: pre-wrap;
       }
       gr-date-formatter {
@@ -72,12 +76,44 @@
         right: 0;
         top: 10px;
       }
+      .file {
+        border-top: 1px solid #ddd;
+        font-weight: bold;
+        margin: 10px 0 3px;
+        padding: 10px 0 5px;
+      }
+      .commentContainer {
+        display: flex;
+        margin: 5px 0;
+      }
+      .lineNum {
+        width: 75px;
+      }
+      .commentMessage {
+        flex: 1;
+      }
     </style>
     <div class$="[[_computeClass(expanded)]]">
       <img class="avatar" src$="[[_computeAvatarURL(message.author)]]">
       <div class="contentContainer">
         <div class="name" id="name">[[message.author.name]]</div>
-        <div class="content">[[message.message]]</div>
+        <div class="content">
+          <div class="message">[[message.message]]</div>
+          <div class="comments">
+            <template is="dom-repeat" items="{{files}}" as="file">
+              <div class="file">
+                <a href$="[[_computeFileDiffURL(file, changeNum, message._revision_number)]]">[[file]]</a>:
+              </div>
+              <template is="dom-repeat" items="[[_computeCommentsForFile(file)]]" as="comment">
+                <div class="commentContainer">
+                  <a class="lineNum"
+                     href$="[[_computeDiffLineURL(file, changeNum, message._revision_number, comment.line)]]">Line <span>[[comment.line]]</span>:</a>
+                  <div class="commentMessage">[[comment.message]]</div>
+                </div>
+              </template>
+            </template>
+          </div>
+        </div>
         <gr-date-formatter date-str="[[message.date]]"></gr-date-formatter>
       </div>
     </div>
@@ -95,12 +131,33 @@
       },
 
       properties: {
+        changeNum: Number,
         message: Object,
+        comments: {
+          type: Object,
+          observer: '_commentsChanged',
+        },
         expanded: {
           type: Boolean,
           value: false,
           reflectToAttribute: true,
         },
+      },
+
+      _commentsChanged: function(value) {
+        this.files = Object.keys(value).sort();
+      },
+
+      _computeFileDiffURL: function(file, changeNum, patchNum) {
+        return '/c/' + changeNum + '/' + patchNum + '/' + file;
+      },
+
+      _computeDiffLineURL: function(file, changeNum, patchNum, line) {
+        return this._computeFileDiffURL(file, changeNum, patchNum) + '@' + line;
+      },
+
+      _computeCommentsForFile: function(file) {
+        return this.comments[file];
       },
 
       _tapHandler: function(e) {

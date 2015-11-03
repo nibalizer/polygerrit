@@ -13,7 +13,9 @@
     </style>
     <h3>Messages</h3>
     <template is="dom-repeat" items="{{messages}}" as="message">
-      <gr-message message="[[message]]"></gr-message>
+      <gr-message change-num="[[changeNum]]"
+                  message="[[message]]"
+                  comments="[[_computeCommentsForMessage(comments, message, index)]]"></gr-message>
     </template>
   </template>
   <script>
@@ -24,15 +26,39 @@
       is: 'gr-messages-list',
 
       properties: {
+        changeNum: Number,
         messages: {
           type: Array,
           value: [],
         },
-        comments: {
-          type: Array,
-          value: [],
-        },
+        comments: Object,
       },
+
+      _computeCommentsForMessage: function(comments, message, index) {
+        var comments = comments || {};
+        var messages = this.messages || [];
+        var msgComments = {};
+        var mDate = util.parseDate(message.date);
+        var nextMDate;
+        if (index < messages.length - 1) {
+          nextMDate = util.parseDate(messages[index + 1].date);
+        }
+        for (var file in comments) {
+          var fileComments = comments[file];
+          for (var i = 0; i < fileComments.length; i++) {
+            var cDate = util.parseDate(fileComments[i].updated);
+            if (cDate >= mDate) {
+              if (nextMDate && cDate >= nextMDate) {
+                continue;
+              }
+              msgComments[file] = msgComments[file] || [];
+              msgComments[file].push(fileComments[i]);
+            }
+          }
+        }
+        return msgComments;
+      },
+
     });
   })();
   </script>

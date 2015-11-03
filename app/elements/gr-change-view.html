@@ -98,7 +98,9 @@
                     patch-num="[[_computePatchNum(change.current_revision)]]"
                     revision="[[change.current_revision]]"
                     comments="[[comments]]"></gr-file-list>
-      <gr-messages-list messages="[[change.messages]]" comments="[[comments]]"></gr-messages-list>
+      <gr-messages-list change-num="[[changeNum]]"
+                        messages="[[change.messages]]"
+                        comments="[[comments]]"></gr-messages-list>
     </div>
   </template>
   <script>
