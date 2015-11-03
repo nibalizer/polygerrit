@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 )
 
@@ -79,13 +80,20 @@ func (w gzipResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 
 type server struct{}
 
-// fePaths contains any path prefixes that should resolve to index.html.
-var fePaths = []string{"/q/", "/c/"}
+// Any path prefixes that should resolve to index.html.
+var (
+	fePaths    = []string{"/q/", "/c/"}
+	issueNumRE = regexp.MustCompile(`^\/\d+\/?$`)
+)
 
 func (_ *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s %s %s %s\n", r.Proto, r.Method, r.RemoteAddr, r.URL)
 	for _, prefix := range fePaths {
 		if strings.HasPrefix(r.URL.Path, prefix) {
+			r.URL.Path = "/"
+			log.Println("Redirecting to /")
+			break
+		} else if match := issueNumRE.Find([]byte(r.URL.Path)); match != nil {
 			r.URL.Path = "/"
 			log.Println("Redirecting to /")
 			break
