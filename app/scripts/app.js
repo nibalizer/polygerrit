@@ -32,7 +32,7 @@
     });
 
     page(/^\/c\/(\d+)\/(\d+)\/(.+)/, scrollToTop, function(ctx) {
-      app.route = 'gr-diff';
+      app.route = 'gr-diff-view';
       var params = {
         changeNum: ctx.params[0],
         patchNum: ctx.params[1],

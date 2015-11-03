@@ -1,7 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="./gr-change-list-view.html">
 <link rel="import" href="./gr-change-view.html">
-<link rel="import" href="./gr-diff.html">
+<link rel="import" href="./gr-diff-view.html">
 <link rel="import" href="./gr-search-bar.html">
 
 <dom-module id="gr-app">
@@ -61,7 +61,7 @@
         <gr-change-view params="[[params]]"></gr-change-view>
       </template>
       <template is="dom-if" if="{{_showDiffView}}" restamp="true">
-        <gr-diff></gr-diff>
+        <gr-diff-view params="[[params]]"></gr-diff-view>
       </template>
     </main>
     <footer role="contentinfo">Powered by PolyGerrit</footer>
@@ -90,7 +90,7 @@
       _routeChanged: function(route) {
         this.set('_showChangeList', route == 'gr-change-list');
         this.set('_showChangeView', route == 'gr-change-view');
-        this.set('_showDiffView', route == 'gr-diff');
+        this.set('_showDiffView', route == 'gr-diff-view');
         this.constrained = route == 'gr-change-view';
       },
 

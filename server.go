@@ -37,14 +37,16 @@ func main() {
 
 func handleRESTProxy(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	u, err := url.Parse("https://gerrit-review.googlesource.com")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	req := &http.Request{
+		Method: "GET",
+		URL: &url.URL{
+			Scheme:   "https",
+			Host:     "gerrit-review.googlesource.com",
+			Opaque:   r.URL.EscapedPath(),
+			RawQuery: r.URL.RawQuery,
+		},
 	}
-	u.Path = r.URL.Path
-	u.RawQuery = r.URL.RawQuery
-	res, err := http.Get(u.String())
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
