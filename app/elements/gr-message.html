@@ -54,7 +54,8 @@
         font-weight: bold;
       }
       .collapsed .name,
-      .collapsed .content {
+      .collapsed .content,
+      .collapsed .message {
         display: inline;
       }
       .collapsed .comments {
@@ -146,7 +147,8 @@
       },
 
       _commentsChanged: function(value) {
-        this.files = Object.keys(value).sort();
+        this.files = Object.keys(value || {}).sort();
+        this.expanded = this.files.length > 0;
       },
 
       _computeFileDiffURL: function(file, changeNum, patchNum) {
