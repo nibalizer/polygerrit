@@ -6,33 +6,39 @@
       :host {
         display: block;
       }
-      table {
-        border-collapse: collapse;
+      .diffContainer {
+        display: flex;
         font-family: 'Source Code Pro', monospace;
-        white-space: pre-wrap;
-        word-wrap: break-word;
+        white-space: pre;
       }
-      td {
-        vertical-align: top;
+      .diffNumbers {
+        border-right: 1px solid #eee;
+        color: #aaa;
+        padding: 0 10px;
+        text-align: right;
+      }
+      .diffContent {
+        padding-left: 2px;
       }
       .lineNum {
-        border-right: 1px solid #ddd;
-        color: #aaa;
         cursor: pointer;
-        padding-right: 10px;
-        text-align: right;
       }
       .lineNum:hover {
         text-decoration: underline;
       }
-      td:not(.lineNum) {
-        padding-left: 5px;
-      }
-      .removedLine {
+      .lightRed {
         background-color: #fee;
       }
-      .addedLine {
+      .darkRed,
+      .delete span {
+        background-color: #faa;
+      }
+      .lightGreen {
         background-color: #efe;
+      }
+      .darkGreen,
+      .insert span {
+        background-color: #9f9;
       }
     </style>
     <iron-ajax id="changeDetailXHR"
@@ -48,7 +54,12 @@
         handle-as="text"
         on-response="_handleDiffResponse"
         debounce-duration="300"></iron-ajax>
-    <table id="diffTable"></table>
+    <div class="diffContainer" id="diffContainer">
+      <div class="diffNumbers" id="leftDiffNumbers"></div>
+      <div class="diffContent" id="leftDiffContent"></div>
+      <div class="diffNumbers" id="rightDiffNumbers"></div>
+      <div class="diffContent" id="rightDiffContent"></div>
+    </div>
   </template>
   <script>
   (function() {
@@ -82,12 +93,9 @@
           return;
         }
         this.$.changeDetailXHR.generateRequest();
-        // this.$.diffXHR.generateRequest();
-        // this.$.commentsXHR.generateRequest();
       },
 
       _revisionChanged: function(value) {
-        console.log('revision: ', value);
         if (!value) { return; }
         this.$.diffXHR.generateRequest();
       },
@@ -105,12 +113,10 @@
 
       _handleChangeDetailResponse: function(e, req) {
         this.change = JSON.parse(req.response.substring(')]}\''.length));
-        console.log(this.change)
         this.revision = this.change.current_revision;
       },
 
       _computeDiffPath: function(changeNum, patchNum, path) {
-        console.log('compute diff path!');
         return '/changes/' + changeNum + '/revisions/' + patchNum + '/files/' + encodeURIComponent(path) + '/diff';
       },
 
@@ -120,55 +126,85 @@
       },
 
       _constructDOM: function(diff) {
+        console.log(diff)
         if (!diff.content) { return; }
 
-        var lineNum = 0 + (diff.content.skip || 0);
+        var leftLineNum = 0 + (diff.content.skip || 0);
+        var rightLineNum = leftLineNum;
         for (var i = 0; i < diff.content.length; i++) {
           var diffChunk = diff.content[i];
           if (diffChunk.ab) {
             for (var j = 0; j < diffChunk.ab.length; j++) {
-              this._addRow(++lineNum, diffChunk.ab[j], diffChunk.ab[j], false);
+              this._addRow(++leftLineNum, ++rightLineNum, diffChunk.ab[j], diffChunk.ab[j]);
             }
             continue;
           }
           if (diffChunk.a || diffChunk.b) {
-            var maxLen = Math.max(diffChunk.a && diffChunk.a.length,
-                diffChunk.b && diffChunk.b.length);
+            var aLen = (diffChunk.a && diffChunk.a.length) || 0;
+            var bLen = (diffChunk.b && diffChunk.b.length) || 0;
+            var maxLen = Math.max(aLen, bLen);
             for (var j = 0; j < maxLen; j++) {
               var leftContent;
               if (diffChunk.a && j < diffChunk.a.length) {
                 leftContent = diffChunk.a[j];
+                leftLineNum++;
               }
               var rightContent;
               if (diffChunk.b && j < diffChunk.b.length) {
                 rightContent = diffChunk.b[j];
+                rightLineNum++;
               }
-              this._addRow(++lineNum, leftContent, rightContent, true);
+              var leftHighlight;
+              if (diffChunk.edit_a && j < diffChunk.edit_a.length) {
+                leftHighlight = diffChunk.edit_a[j];
+              }
+              var rightHighlight;
+              if (diffChunk.edit_b && j < diffChunk.edit_b.length) {
+                rightHighlight = diffChunk.edit_b[j];
+              }
+              this._addRow(leftLineNum,
+                           rightLineNum,
+                           leftContent,
+                           rightContent,
+                           leftHighlight,
+                           rightHighlight);
             }
           }
         }
       },
 
-      _addRow: function(lineNum, leftContent, rightContent, highlight) {
-        var rowEl = document.createElement('tr');
-        var leftLineNumEl = document.createElement('td');
-        var rightLineNumEl = document.createElement('td');
-        var leftColEl = document.createElement('td');
-        leftColEl.className = 'style-scope gr-diff';
-        var rightColEl = document.createElement('td');
-        rightColEl.className = 'style-scope gr-diff';
-        leftLineNumEl.className = 'style-scope gr-diff lineNum';
-        rightLineNumEl.className = 'style-scope gr-diff lineNum';
-        leftLineNumEl.textContent = lineNum;
-        rightLineNumEl.textContent = lineNum;
+      _addRow: function(leftLineNum,
+                        rightLineNum,
+                        leftContent,
+                        rightContent,
+                        leftHighlight,
+                        rightHighlight) {
+        var leftLineNumEl = document.createElement('div');
+        var rightLineNumEl = document.createElement('div');
+        var leftColEl = document.createElement('div');
+        leftColEl.className = 'style-scope gr-diff-view';
+        var rightColEl = document.createElement('div');
+        rightColEl.className = 'style-scope gr-diff-view';
+        leftLineNumEl.className = 'style-scope gr-diff-view lineNum';
+        rightLineNumEl.className = 'style-scope gr-diff-view lineNum';
 
-        var leftHTML = this._highlightedHTML(leftContent);
+        // Ensure that all elements have content so they render at the correct
+        // height.
+        leftLineNumEl.textContent = leftContent != undefined ? leftLineNum : '\n';
+        rightLineNumEl.textContent = rightContent != undefined ? rightLineNum : '\n';
+        leftContent = leftContent || '\n';
+        rightContent = rightContent || '\n';
+
+        var leftHTML;
         var rightHTML;
         if (leftContent == rightContent) {
-          rightHTML = leftHTML;
+          leftHTML = leftContent;
+          rightHTML = rightContent;
         } else {
-          rightHTML = this._highlightedHTML(rightContent);
+          leftHTML = this._highlightedHTML(leftContent, leftHighlight);
+          rightHTML = this._highlightedHTML(rightContent, rightHighlight);
         }
+
         // If the html is just the text then it didn't get highlighted.
         // Use textContent which is faster than innerHTML.
         if (leftContent == leftHTML) {
@@ -182,19 +218,30 @@
           rightColEl.innerHTML = rightHTML;
         }
 
-        if (highlight) {
-          leftColEl.classList.add('removedLine');
-          rightColEl.classList.add('addedLine');
+        if (leftContent != rightContent) {
+          leftColEl.classList.add('delete');
+          rightColEl.classList.add('insert');
+          leftColEl.classList.add(leftHighlight ? 'lightRed' : 'darkRed');
+          rightColEl.classList.add(rightHighlight ? 'lightGreen' : 'darkGreen');
         }
-        rowEl.appendChild(leftLineNumEl);
-        rowEl.appendChild(leftColEl);
-        rowEl.appendChild(rightLineNumEl);
-        rowEl.appendChild(rightColEl);
-        this.$.diffTable.appendChild(rowEl);
+        this.$.leftDiffNumbers.appendChild(leftLineNumEl);
+        this.$.leftDiffContent.appendChild(leftColEl);
+        this.$.rightDiffNumbers.appendChild(rightLineNumEl);
+        this.$.rightDiffContent.appendChild(rightColEl);
       },
 
-      _highlightedHTML: function(html) {
-        return html;
+      _highlightedHTML: function(content, range) {
+        // range is a <skip length, mark length> pair.
+        console.log('--', content)
+        var toHighlight = content.substr(range[0], range[1]);
+        console.log(range, toHighlight);
+        var result = content.slice(0, range[0]) +
+            '<span class="style-scope gr-diff-view">' +
+            content.slice(range[0], range[0] + range[1]) +
+            '</span>' +
+            content.slice(range[0] + range[1]);
+        console.log(result)
+        return result;
       },
 
     });
