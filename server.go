@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"compress/gzip"
+        "crypto/tls"
 	"errors"
 	"flag"
 	"io"
@@ -32,7 +33,10 @@ func main() {
 	http.HandleFunc("/changes/", handleRESTProxy)
 	http.HandleFunc("/accounts/", handleRESTProxy)
 	log.Println("Serving on port", *port)
-	log.Fatal(http.ListenAndServe(*port, &server{}))
+        err := http.ListenAndServe(*port, &server{})
+        if err != nil {
+            log.Fatal("ListenAndServe: ", err)
+        }
 }
 
 func handleRESTProxy(w http.ResponseWriter, r *http.Request) {
@@ -41,14 +45,19 @@ func handleRESTProxy(w http.ResponseWriter, r *http.Request) {
 		Method: "GET",
 		URL: &url.URL{
 			Scheme:   "https",
-			Host:     "gerrit-review.googlesource.com",
+			Host:     "review-dev.openstack.org",
 			Opaque:   r.URL.EscapedPath(),
 			RawQuery: r.URL.RawQuery,
 		},
 	}
-	res, err := http.DefaultClient.Do(req)
+        tr := &http.Transport{
+            TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+        }
+        client := &http.Client{Transport: tr}
+	res, err := client.Do(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+                log.Println("Error in proxy request:", err)
 		return
 	}
 	defer res.Body.Close()
